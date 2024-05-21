@@ -1,19 +1,39 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
+import { GrToast } from "react-icons/gr";
 import { LuFolderMinus } from "react-icons/lu";
-import ReactSelectCreatable from "react-select/creatable";
-import Creatable, { useCreatable } from "react-select/creatable";
+import CreatableSelect from 'react-select/creatable';
+import { toast } from "react-toastify";
 
 const CreateJob = () => {
   const [selectedOption, setSelectedOption] = useState(null);
   const {
     register,
     handleSubmit,
+    reset,
 
     formState: { errors },
   } = useForm();
 
-  const onSubmit = (data) => console.log(data);
+  const onSubmit = (data) => {
+    data.skills = selectedOption;
+    fetch("http://localhost:3000/post-job", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+      },
+      body: JSON.stringify(data),
+    })
+      .then((res) => res.json())
+      .then((result) => {
+        console.log(result);
+        if(result.acknowledged === true){
+          alert("Job Posted Successfully!")
+        }
+        reset()
+      });
+    console.log(data);
+  };
 
   const options = [
     { value: "Javascript", label: "Javascript" },
@@ -131,9 +151,9 @@ const CreateJob = () => {
 
           <div>
             <label className="block mb-2 text-lg">Required skill sets:</label>
-            <ReactSelectCreatable
+            <CreatableSelect
               defaultValue={selectedOption}
-              onChange={selectedOption}
+              onChange={(selectedOptions) => setSelectedOption(selectedOptions)}
               options={options}
               isMulti
               className="create-job-input py-4"

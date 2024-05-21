@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 const MyJobs = () => {
@@ -6,11 +6,23 @@ const MyJobs = () => {
   const [searchText, setSearchText] = useState("");
   const [isLoading, setIsLoading] = useState(true);
 
+
+  useEffect(()=>{
+    setIsLoading(true)
+    fetch("http://localhost:3000/myJobs/prasna@gmail.com")
+    .then((res)=>res.json())
+    .then((data)=>{
+      setJobs(data);
+    })
+  },[]) 
+
   const handleSearch = () => {
     const filter = jobs.filter(
       (job) =>
         job.jobTitle.toLowerCase().indexOf(searchText.toLowerCase()) !== -1
     );
+    setJobs(filter);
+
     console.log(filter);
     setIsLoading(false);
   };
@@ -35,6 +47,8 @@ const MyJobs = () => {
           </button>
         </div>
       </div>
+
+      {/* table */}
 
       <section className="py-1 bg-blueGray-50">
         <div className="w-full xl:w-8/12 mb-12 xl:mb-0 px-4 mx-auto mt-24">
@@ -83,29 +97,29 @@ const MyJobs = () => {
                 </thead>
 
                 <tbody>
-                  {/* {jobs.map((job, index) => ( */}
+                  {jobs.map((job, index) => (
                     <tr 
-                    // key={index}
+                    key={index}
                     >
                       <th className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 text-left text-blueGray-700 ">
-                        {/* {index + 1} */}
+                        {index + 1}
                         123
                       </th>
                       <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 ">
-                        {/* {job.jobTitle} */}
+                        {job.jobTitle}
                         Developer
                       </td>
                       <td className="border-t-0 px-6 align-center border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                        {/* {job.companyName} */}
-                        Softwarica
+                        {job.companyName}
+                        
                       </td>
                       <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                        {/* ${job.minPrice}-${job.maxPrice} */}
-                        8000
+                        ${job.minPrice}-${job.maxPrice}
+                        
                       </td>
                       <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
                         <button>
-                          <Link to={""}>Edit</Link>
+                          <Link to={``/edit-job/${job?._id}"}>Edit</Link>
                         </button>
                       </td>
                       <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
@@ -114,7 +128,7 @@ const MyJobs = () => {
                         </button>
                       </td>
                     </tr>
-                  {/* ))} */}
+                  ))} 
                 </tbody>
               </table>
             </div>
