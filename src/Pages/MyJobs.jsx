@@ -7,14 +7,41 @@ const MyJobs = () => {
   const [isLoading, setIsLoading] = useState(true);
 
 
+  //set current page
+  const[currentPage,setCurrentPage]=useState(1);
+  const itemsPerPage=4;
+
   useEffect(()=>{
     setIsLoading(true)
-    fetch("http://localhost:3000/myJobs/prasna@gmail.com")
+    fetch(`http://localhost:3000/myJobs/prasna123@gmail.com`)
     .then((res)=>res.json())
     .then((data)=>{
       setJobs(data);
+      setIsLoading(false)
+
     })
-  },[]) 
+     
+  },[searchText]) ;
+
+  //pagination
+  const indexOfLastItem=currentPage*itemsPerPage;
+  const itemsOfFirstItem=indexOfLastItem-itemsPerPage;
+  
+  const currentJobs=jobs.slice(itemsOfFirstItem,indexOfLastItem)
+
+
+  //next btn n previous btn
+  const nextPage=()=>{
+    if(indexOfLastItem <jobs.length){
+      setCurrentPage(currentPage + 1)
+    }
+  }
+
+  const prevPage=()=>{
+    if(currentPage>1){
+      setCurrentPage(currentPage-1)
+    }
+  }
 
   const handleSearch = () => {
     const filter = jobs.filter(
@@ -26,6 +53,19 @@ const MyJobs = () => {
     console.log(filter);
     setIsLoading(false);
   };
+
+  const handleDelete=(id)=>{
+    // console.log(id)
+    fetch(`http://localhost:3000/job/${id}`,{
+      method:"DELETE"
+    }).then(res=>res.json).then(data=>{
+      if(data.acknowledged === true){
+        alert("Job Deleted Successfully")
+      }
+
+    })
+
+  }
 
   return (
     <div className="max-w-screen-2xl container mx-autp xl:px-24 px-4">
@@ -96,43 +136,59 @@ const MyJobs = () => {
                   </tr>
                 </thead>
 
-                <tbody>
-                  {jobs.map((job, index) => (
-                    <tr 
-                    key={index}
-                    >
-                      <th className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 text-left text-blueGray-700 ">
-                        {index + 1}
-                        123
-                      </th>
-                      <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 ">
-                        {job.jobTitle}
-                        Developer
-                      </td>
-                      <td className="border-t-0 px-6 align-center border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                        {job.companyName}
-                        
-                      </td>
-                      <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                        ${job.minPrice}-${job.maxPrice}
-                        
-                      </td>
-                      <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                        <button>
-                          <Link to={``/edit-job/${job?._id}"}>Edit</Link>
-                        </button>
-                      </td>
-                      <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                        <button className="bg-red-700 py-2 px-6 text-white rounded-sm ">
-                          Delete
-                        </button>
-                      </td>
-                    </tr>
-                  ))} 
-                </tbody>
+                {
+                  isLoading ? (<div className="flex items-center justify-center"><p>Loading..</p></div>):(
+                    <tbody>
+                      {currentJobs.map((job, index) => (
+                        <tr 
+                        key={index}
+                        >
+                          <th className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 text-left text-blueGray-700 ">
+                            {index + 1}
+                            
+                          </th>
+                          <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 ">
+                            {job.jobTitle}
+                          </td>
+                          <td className="border-t-0 px-6 align-center border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                            {job.companyName}
+                            
+                          </td>
+                          <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                            ${job.minPrice}-${job.maxPrice}
+                            
+                          </td>
+                          <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                            <button>
+                              <Link to={`/edit-job/${job?._id}`}>Edit</Link>
+                            </button>
+                          </td>
+                          <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                            <button onClick={()=>handleDelete(job._id)}className="bg-red-700 py-2 px-6 text-white rounded-sm ">
+                              Delete
+                            </button>
+                          </td>
+                        </tr>
+                      ))} 
+                    </tbody>)
+                }
+
               </table>
             </div>
           </div>
+        </div>
+        {/* pagination */}
+        <div className="flex justify-center text-black space-x-8">
+          {
+            currentPage>1 &&(
+              <button className="hover:underline" onClick={prevPage}>Previous</button>
+            )
+          }{
+            indexOfLastItem<jobs.length &&(
+              <button className="hover:underline" onClick={nextPage}>Next</button>
+            )
+          }
+
         </div>
       </section>
     </div>
