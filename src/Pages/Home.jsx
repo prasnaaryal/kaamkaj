@@ -6,6 +6,12 @@ import Sidebar from "../sidebar/Sidebar";
 import Newsletter from "../components/Newsletter";
 
 const Home = () => {
+
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const openModal = () => setIsModalOpen(true);
+  const closeModal = () => setIsModalOpen(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
