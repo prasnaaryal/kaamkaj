@@ -1,9 +1,9 @@
 import React from 'react';
 
-const Modal = ({ isOpen, onClose, title, children }) => {
+const Modal = ({ isOpen, onClose, title, children, className = '' }) => {
   return (
     <div className={`z-10 fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 ${isOpen ? '' : 'hidden'}`}>
-      <div className="bg-white rounded-lg overflow-hidden shadow-xl transform transition-all max-w-lg w-full">
+      <div className={`bg-white rounded-lg overflow-hidden shadow-xl transform transition-all max-w-lg w-full max-h-[95vh] ${className}`}>
         <div className="p-4 flex justify-end items-center">
           <button
             className="text-gray-400 hover:text-gray-500 focus:outline-none"
@@ -17,7 +17,6 @@ const Modal = ({ isOpen, onClose, title, children }) => {
         <div className="p-4">
           {children}
         </div>
-        
       </div>
     </div>
   );
