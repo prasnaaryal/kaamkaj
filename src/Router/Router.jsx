@@ -7,6 +7,9 @@ import SalaryPage from "../Pages/SalaryPage";
 import UpdateJob from "../Pages/UpdateJob";
 import JobDetail from "../Pages/JobDetail/JobDetail";
 import Dashboard from "../Pages/manage/Dashboard";
+import EditProfile from "../Pages/manage/EditProfile";
+import AppliedJobs from "../Pages/User/AppliedJobs";
+import SavedJobs from "../Pages/User/SavedJobs";
 
 
 
@@ -34,6 +37,18 @@ const router = createBrowserRouter([
       {
         path: "/dashboard",
         element: <Dashboard/>,
+      },
+      {
+        path: "/savedjobs",
+        element: <SavedJobs/>,
+      },
+      {
+        path: "/appliedjobs",
+        element: <AppliedJobs/>,
+      },
+      {
+        path: "/editprofile",
+        element: <EditProfile/>,
       },
       {
         path: "/jobdetail",
