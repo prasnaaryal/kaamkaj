@@ -43,7 +43,7 @@ const Navbar = () => {
     <header className="max-w-screen-2xl container mx-auto xl:px-24 px-4">
       <nav className="flex justify-between items-center py-2">
         <a href="/" className="flex items-center gap-2 text-2xl">
-          <img src="/images/logo.png" alt="logo" className="w-[80px] h-auto" />
+          <img src="images\image.png" alt="logo" className="w-[80px] h-auto" />
         </a>
 
         <ul className="hidden md:flex gap-12">
