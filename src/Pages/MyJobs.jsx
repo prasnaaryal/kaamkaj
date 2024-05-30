@@ -1,47 +1,32 @@
 import React, { useEffect, useState } from "react";
+import { BsWallet } from "react-icons/bs";
+import { FaUserFriends } from "react-icons/fa";
+import { RiDeleteBinLine } from "react-icons/ri";
+import { SiTicktick } from "react-icons/si";
+import { TbEdit } from "react-icons/tb";
 import { Link } from "react-router-dom";
 
 const MyJobs = () => {
   const [jobs, setJobs] = useState([]);
   const [searchText, setSearchText] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 4;
 
-
-  //set current page
-  const[currentPage,setCurrentPage]=useState(1);
-  const itemsPerPage=4;
-
-  useEffect(()=>{
-    setIsLoading(true)
+  useEffect(() => {
+    setIsLoading(true);
     fetch(`http://localhost:3000/myJobs/prasna123@gmail.com`)
-    .then((res)=>res.json())
-    .then((data)=>{
-      setJobs(data);
-      setIsLoading(false)
+      .then((res) => res.json())
+      .then((data) => {
+        setJobs(data);
+        setIsLoading(false);
+      });
+  }, [searchText]);
 
-    })
-     
-  },[searchText]) ;
-
-  //pagination
-  const indexOfLastItem=currentPage*itemsPerPage;
-  const itemsOfFirstItem=indexOfLastItem-itemsPerPage;
-  
-  const currentJobs=jobs.slice(itemsOfFirstItem,indexOfLastItem)
-
-
-  //next btn n previous btn
-  const nextPage=()=>{
-    if(indexOfLastItem <jobs.length){
-      setCurrentPage(currentPage + 1)
-    }
-  }
-
-  const prevPage=()=>{
-    if(currentPage>1){
-      setCurrentPage(currentPage-1)
-    }
-  }
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const itemsOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentJobs = jobs.slice(itemsOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(jobs.length / itemsPerPage);
 
   const handleSearch = () => {
     const filter = jobs.filter(
@@ -49,35 +34,77 @@ const MyJobs = () => {
         job.jobTitle.toLowerCase().indexOf(searchText.toLowerCase()) !== -1
     );
     setJobs(filter);
-
-    console.log(filter);
     setIsLoading(false);
   };
 
-  const handleDelete=(id)=>{
-    // console.log(id)
-    fetch(`http://localhost:3000/job/${id}`,{
-      method:"DELETE"
-    }).then(res=>res.json).then(data=>{
-      if(data.acknowledged === true){
-        alert("Job Deleted Successfully")
-      }
-
+  const handleDelete = (id) => {
+    fetch(`http://localhost:3000/job/${id}`, {
+      method: "DELETE",
     })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.acknowledged === true) {
+          alert("Job Deleted Successfully");
+          setJobs(jobs.filter((job) => job._id !== id));
+        }
+      });
+  };
 
-  }
+  const changePage = (page) => {
+    setCurrentPage(page);
+  };
+
+  const Pagination = ({ totalPages, currentPage, changePage }) => {
+    const pages = [];
+    for (let i = 1; i <= totalPages; i++) {
+      pages.push(i);
+    }
+
+    return (
+      <div className="flex justify-center items-center space-x-2 mt-10 mb-4">
+        {currentPage > 1 && (
+          <button
+            onClick={() => changePage(currentPage - 1)}
+            className="text-blue-600 hover:underline text-sm"
+          >
+            &lt;
+          </button>
+        )}
+        {pages.map((page) => (
+          <button
+            key={page}
+            onClick={() => changePage(page)}
+            className={`w-6 h-6 rounded-full flex items-center justify-center text-xs ${
+              currentPage === page
+                ? "bg-blue-600 text-white"
+                : "bg-gray-200 text-gray-700"
+            }`}
+          >
+            {page}
+          </button>
+        ))}
+        {currentPage < totalPages && (
+          <button
+            onClick={() => changePage(currentPage + 1)}
+            className="text-blue-600 hover:underline text-sm"
+          >
+            &gt;
+          </button>
+        )}
+      </div>
+    );
+  };
 
   return (
-    <div className="max-w-screen-2xl container mx-autp xl:px-24 px-4">
-      <div className="my-jobs-container">
-        <h1 className="text-center p-4">All My Jobs</h1>
+    <div className="max-w-screen-3xl container mx-auto 2xl:px-24 px-4">
+      <div className="my-jobs-container ">
         <div className="search-box p-2 text-center mb-2">
           <input
             onChange={(e) => setSearchText(e.target.value)}
             type="text"
             name="search"
             id="search"
-            className="py-2 pl-3 border focus:outline-none lg:w-6/12 mb-4 w-full"
+            className="py-2 pl-3 border focus:outline-none lg:w-4/12 mt-20 w-8"
           />
           <button
             className="bg-blue-400 text-white font-semibold px-8 py-2 rounded-sm mb-4"
@@ -88,108 +115,103 @@ const MyJobs = () => {
         </div>
       </div>
 
-      {/* table */}
-
       <section className="py-1 bg-blueGray-50">
         <div className="w-full xl:w-8/12 mb-12 xl:mb-0 px-4 mx-auto mt-24">
-          <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-6 shadow-lg rounded ">
-            <div className="rounded-t mb-0 px-4 py-3 border-0">
-              <div className="flex flex-wrap items-center">
-                <div className="relative w-full px-4 max-w-full flex-grow flex-1">
-                  <h3 className="font-semibold text-base text-blueGray-700">
-                    All Jobs
-                  </h3>
-                </div>
-                <div className="relative w-full px-4 max-w-full flex-grow flex-1 text-right">
-                  <button
-                    className="bg-indigo-500 text-white active:bg-indigo-600 text-xs font-bold uppercase px-3 py-1 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
-                    type="button"
-                  >
-                    See all
-                  </button>
-                </div>
-              </div>
-            </div>
-
+          <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-6 shadow-lg rounded">
             <div className="block w-full overflow-x-auto">
               <table className="items-center bg-transparent w-full border-collapse ">
-                <thead>
+                <thead className="bg-[#D9D9D9] bg-opacity-50 h-16 font-semibold">
                   <tr>
                     <th className="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
                       NO
                     </th>
-                    <th className="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
+                    <th className="px-16 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
                       Title
                     </th>
                     <th className="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
-                      Company Name
+                      Status
                     </th>
                     <th className="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
                       Salary
                     </th>
                     <th className="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
-                      EDIT
+                      Applicants
                     </th>
-                    <th className="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
-                      DELETE
+                    <th className="px-8 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
+                      Action
                     </th>
+                    
                   </tr>
                 </thead>
+                {isLoading ? (
+                  <div className="flex items-center justify-center">
+                    <p>Loading..</p>
+                  </div>
+                ) : (
+                  <tbody>
+                    {currentJobs.map((job, index) => (
+                      <tr key={index}>
+                        <th className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 text-left text-blueGray-700">
+                          {index + 1}
+                        </th>
+                        <td className="border-t-0 px-6 align-middle border-l-0 border-r-0  whitespace-nowrap p-4">
+                         <h1 className="flex justify-center text-xs font-semibold">{job.jobTitle}</h1> 
+                         <div className="flex gap-4  text-[#5E6670] text-xs">
+                         <p className="">{job.employmentType}</p>
+                          <p className="">{job.postingDate}</p>
 
-                {
-                  isLoading ? (<div className="flex items-center justify-center"><p>Loading..</p></div>):(
-                    <tbody>
-                      {currentJobs.map((job, index) => (
-                        <tr 
-                        key={index}
-                        >
-                          <th className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 text-left text-blueGray-700 ">
-                            {index + 1}
-                            
-                          </th>
-                          <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 ">
-                            {job.jobTitle}
-                          </td>
-                          <td className="border-t-0 px-6 align-center border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                         </div>
+
+                         
+                        </td>
+                        <td className="border-t-0 mt-2 px-4 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 ">
+                          <div className="flex space text-[#0ba02c]">
+                            <SiTicktick className="text-[#0ba02c] mr-2" />
+                            Active
+                          </div>
+                        </td>
+                        <td className="border-t-0 mt-2 px-4 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 flex items-center">
+                          <div className="flex space text-[#5E6670]">
+                            <BsWallet className="text-[#0A65CC] mr-2" />$
+                            {job.minPrice}-${job.maxPrice}
+                          </div>
+                        </td>
+                        <td className="border-t-0 mt-2 px-4 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                          <div className="mr-2 flex text-xs text-[#0A65CC]">
+                            <FaUserFriends className="text-[#5E6670] mr-2" />
                             {job.companyName}
-                            
-                          </td>
-                          <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                            ${job.minPrice}-${job.maxPrice}
-                            
-                          </td>
-                          <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                            <button>
-                              <Link to={`/edit-job/${job?._id}`}>Edit</Link>
-                            </button>
-                          </td>
-                          <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                            <button onClick={()=>handleDelete(job._id)}className="bg-red-700 py-2 px-6 text-white rounded-sm ">
-                              Delete
-                            </button>
-                          </td>
-                        </tr>
-                      ))} 
-                    </tbody>)
-                }
-
+                          </div>
+                        </td>
+                        <div>
+                        <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                          <button className="text-indigo-600 hover:underline">
+                            <Link to={`/edit-job/${job?._id}`}>
+                              <TbEdit className="text-[#0ba02c] w-4 h-4" />
+                            </Link>
+                          </button>
+                        </td>
+                        <td className=" p-4">
+                          <button
+                            onClick={() => handleDelete(job._id)}
+                            className="py-2 px-2"
+                          >
+                            <RiDeleteBinLine className="text-red-600 w-4 h-4" />
+                          </button>
+                        </td>
+                        </div>
+                      </tr>
+                    ))}
+                  </tbody>
+                )}
               </table>
             </div>
           </div>
         </div>
-        {/* pagination */}
-        <div className="flex justify-center text-black space-x-8">
-          {
-            currentPage>1 &&(
-              <button className="hover:underline" onClick={prevPage}>Previous</button>
-            )
-          }{
-            indexOfLastItem<jobs.length &&(
-              <button className="hover:underline" onClick={nextPage}>Next</button>
-            )
-          }
-
-        </div>
+        <Pagination
+          totalPages={totalPages}
+          currentPage={currentPage}
+          changePage={changePage}
+        />
       </section>
     </div>
   );
