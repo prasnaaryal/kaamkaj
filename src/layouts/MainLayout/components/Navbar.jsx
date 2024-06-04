@@ -3,7 +3,7 @@ import { Link, NavLink } from "react-router-dom";
 import { FaBarsStaggered, FaXmark } from "react-icons/fa6";
 import { FaArrowRight } from "react-icons/fa";
 
-import Modal from "./Modal";
+import Modal from "../../../components/Modal";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -107,8 +107,7 @@ const Navbar = () => {
         </ul>
       </div>
 
-   
-   {/* login modal */}
+      {/* login modal */}
       <Modal
         isOpen={isLoginModalOpen}
         onClose={closeLoginModal}
@@ -173,8 +172,7 @@ const Navbar = () => {
         </div>
       </Modal>
 
-
-   {/* signup modal */}
+      {/* signup modal */}
 
       <Modal
         isOpen={isSignupModalOpen}

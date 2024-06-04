@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import Sidebar from "../manage/Sidebar";
+import Sidebar from "../../layouts/MainLayout/components/Sidebar";
 import { SiTicktick } from "react-icons/si";
 import { BsWallet } from "react-icons/bs";
 import { FaUserFriends } from "react-icons/fa";
@@ -7,6 +7,8 @@ import { Link } from "react-router-dom";
 import { TbEdit } from "react-icons/tb";
 import { RiDeleteBinLine } from "react-icons/ri";
 import { RxBookmarkFilled } from "react-icons/rx";
+import { IoLocationOutline } from "react-icons/io5";
+import { CiCalendar } from "react-icons/ci";
 
 const SavedJobs = () => {
   const [jobs, setJobs] = useState([]);
@@ -134,25 +136,31 @@ const SavedJobs = () => {
                           {index + 1}
                         </th>
                         <td className="border-t-0 px-6 align-middle border-l-0 border-r-0  whitespace-nowrap p-4">
-                          <h1 className="flex justify-center text-xs font-semibold">
-                            {job.jobTitle}
-                          </h1>
+                          <div className="flex gap-4">
+                            <h1 className="flex justify-center text-xs font-semibold">
+                              {job.jobTitle}
+                            </h1>
+                            <p className="text-xs bg-blue-200 bg-opacity-30 rounded">
+                              {job.employmentType}
+                            </p>
+                          </div>
                           <div className="flex gap-4  text-[#5E6670] text-xs">
-                            <p className="">{job.employmentType}</p>
-                            <p className="">{job.postingDate}</p>
-                            <p className="">
+                            <p className="flex flex-row gap-2">
                               {" "}
-                              ${job.minPrice}-${job.maxPrice}
+                              <IoLocationOutline />
+                              {job.jobLocation}
+                            </p>
+                            <p className="flex flex-row">
+                              <CiCalendar />
+                              {job.postingDate}
                             </p>
                           </div>
                         </td>
                         <td className="border-t-0 mt-2 px-4 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 ">
                           <div className="flex ">
                             <RxBookmarkFilled className="mr-2" />
-                            
                           </div>
                         </td>
-                       
                       </tr>
                     ))}
                   </tbody>

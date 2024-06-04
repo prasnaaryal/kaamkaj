@@ -1,21 +1,20 @@
-import React, { useEffect, useState } from 'react'
-import Sidebar from '../manage/Sidebar';
-import { SiTicktick } from 'react-icons/si';
-import { BsWallet } from 'react-icons/bs';
-import { FaUserFriends } from 'react-icons/fa';
-import { Link } from 'react-router-dom';
-import { TbEdit } from 'react-icons/tb';
-import { RiDeleteBinLine } from 'react-icons/ri';
+import React, { useEffect, useState } from "react";
+import Sidebar from "../../layouts/MainLayout/components/Sidebar";
+import { SiTicktick } from "react-icons/si";
+import { BsWallet } from "react-icons/bs";
+import { FaUserFriends } from "react-icons/fa";
+import { Link } from "react-router-dom";
+import { TbEdit } from "react-icons/tb";
+import { RiDeleteBinLine } from "react-icons/ri";
 
 const AppliedJobs = () => {
-
-    const [jobs, setJobs] = useState([]);
+  const [jobs, setJobs] = useState([]);
   const [searchText, setSearchText] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 4;
 
-  useEffect (() => {
+  useEffect(() => {
     setIsLoading(true);
     fetch(`http://localhost:3000/myJobs/prasna123@gmail.com`)
       .then((res) => res.json())
@@ -136,8 +135,6 @@ const AppliedJobs = () => {
                     <th className="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
                       Salary
                     </th>
-                   
-                    
                   </tr>
                 </thead>
                 {isLoading ? (
@@ -152,18 +149,17 @@ const AppliedJobs = () => {
                           {index + 1}
                         </th>
                         <td className="border-t-0 px-6 align-middle border-l-0 border-r-0  whitespace-nowrap p-4">
-                         <h1 className="flex justify-center text-xs font-semibold">{job.jobTitle}</h1> 
-                         <div className="flex gap-4  text-[#5E6670] text-xs">
-                         <p className="">{job.employmentType}</p>
-                          <p className="">{job.postingDate}</p>
-
-                         </div>
-
-                         
+                          <h1 className="flex justify-center text-xs font-semibold">
+                            {job.jobTitle}
+                          </h1>
+                          <div className="flex gap-4  text-[#5E6670] text-xs">
+                            <p className="">{job.employmentType}</p>
+                            <p className="">{job.postingDate}</p>
+                          </div>
                         </td>
                         <td className="border-t-0 mt-2 px-4 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 ">
                           <div className="flex space text-[#0ba02c]">
-                            <SiTicktick  className="text-[#0ba02c] mr-2" />
+                            <SiTicktick className="text-[#0ba02c] mr-2" />
                             Active
                           </div>
                         </td>
@@ -173,8 +169,6 @@ const AppliedJobs = () => {
                             {job.minPrice}-${job.maxPrice}
                           </div>
                         </td>
-                        
-                      
                       </tr>
                     ))}
                   </tbody>
@@ -191,9 +185,6 @@ const AppliedJobs = () => {
       </section>
     </div>
   );
-  
-    };
-    
+};
 
-
-export default AppliedJobs
+export default AppliedJobs;
