@@ -40,15 +40,15 @@ const Navbar = () => {
   ];
 
   return (
-    <header className="max-w-screen-2xl container mx-auto xl:px-24 px-4">
-      <nav className="flex justify-between items-center py-2">
+    <header className="max-w-screen-2xl container mx-auto xl:px-24 px-4 border-b border-black/40">
+      <nav className="flex justify-between items-center py-4 ">
         <a href="/" className="flex items-center gap-2 text-2xl">
-          <img src="images\image.png" alt="logo" className="w-[80px] h-auto" />
+          <img src="images\image.png" alt="logo" className="w-[150px] h-auto" />
         </a>
 
         <ul className="hidden md:flex gap-12">
           {navItems.map(({ path, title }) => (
-            <li key={path} className="text-base text-black-500 font-medium">
+            <li key={path} className="text-sx text-black/70 font-medium hover:text-blue-500">
               <NavLink
                 to={path}
                 className={({ isActive }) => (isActive ? "active" : "")}

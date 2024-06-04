@@ -24,7 +24,7 @@ console.log({handleChange})
   return (
     <div>
       <h4 className="text-lg font-medium mb-2">Date of Posting</h4>
-      <div>
+      <div className="flex flex-col gap-2">
         <label className="sidebar-label-container">
           <input
             type="radio"

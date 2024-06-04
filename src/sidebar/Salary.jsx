@@ -12,17 +12,13 @@ const Salary = ({ handleChange, handleClick }) => {
         <Button onClickHandler={handleClick} value="Yearly" title="Yearly" />
       </div>
 
-      <div>
-        <label className="sidebar-label-container">
-          <input
-            type="radio"
-            name="test"
-            id="test"
-            value=""
-            onChange={handleChange}
-          />
-          <span className="checkmark"></span>All
-        </label>
+      <div className="flex flex-col gap-2">
+        <InputField
+          handleChange={handleChange}
+          value="All"
+          title="All"
+          name="test2"
+        />
 
         <InputField
           handleChange={handleChange}

@@ -5,17 +5,15 @@ const WorkExperience = ({ handleChange }) => {
   return (
     <div>
     <h4 className="text-lg font-medium mb-2">Work Experience</h4>
-    <div>
-      <label className="sidebar-label-container">
-        <input
-          type="radio"
-          name="test"
-          id="test"
-          value=""
-          onChange={handleChange}
-        />
-        <span className="checkmark"></span>All
-      </label>
+    <div className="flex flex-col gap-2">
+     
+
+      <InputField
+        handleChange={handleChange}
+        value="All"
+        title="All"
+        name="test"
+      />
 
       <InputField
         handleChange={handleChange}
