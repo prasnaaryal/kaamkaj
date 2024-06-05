@@ -6,6 +6,8 @@ import Jobs from '../Jobs';
 import { FaLocationDot } from 'react-icons/fa6';
 import Newsletter from '../../components/Newsletter';
 import Sidebar from '../../sidebar/Sidebar';
+import Clients from './components/Clients';
+import LastBanner from './components/LastBanner';
 
 const NewHomePage = () => {
 
@@ -199,6 +201,8 @@ const NewHomePage = () => {
           </div>
         </div>
       </div>
+      <Clients/>
+      <LastBanner/>
 
 
         

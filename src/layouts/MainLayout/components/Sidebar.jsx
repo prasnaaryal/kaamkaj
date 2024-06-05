@@ -1,64 +1,34 @@
-import React from "react";
-import { FaUserCircle, FaBookmark, FaTachometerAlt, FaBriefcase, FaCog } from "react-icons/fa"; // Imported additional icons
-import { Outlet } from "react-router-dom";
+import React from 'react';
+import { Menu, MenuItem } from 'react-pro-sidebar';
+import { FaTachometerAlt, FaBriefcase, FaBookmark, FaUser, FaCog } from 'react-icons/fa'; // Importing icons
+import { Link } from 'react-router-dom'; // Importing Link from react-router-dom
+import { Outlet } from 'react-router-dom'; // Importing Outlet from react-router-dom
+import { MdDashboard } from 'react-icons/md';
 
 const Sidebar = () => {
   const menuItems = [
-    {
-      href: "/manage/dashboard",
-      icon: <FaTachometerAlt className="w-5 h-5" />,
-      label: "Dashboard",
-    },
-    {
-      href: "/manage/my-job",
-      icon: <FaBriefcase className="w-5 h-5" />,
-      label: "Jobs",
-    },
-    {
-      href: "/manage/saved-jobs",
-      icon: <FaBookmark className="w-5 h-5" />,
-      label: "Saved Jobs",
-    },
-    {
-      href: "/manage/edit-profile",
-      icon: <FaUserCircle className="w-5 h-5" />,
-      label: "Profile",
-    },
-    {
-      href: "/manage/settings",
-      icon: <FaCog className="w-5 h-5" />,
-      label: "Settings",
-    },
+    { href: "/manage/dashboard", icon: MdDashboard 
+    , label: "Dashboard" },
+    { href: "/manage/my-job", icon: FaBriefcase, label: "Jobs" },
+    { href: "/manage/saved-jobs", icon: FaBookmark, label: "Saved Jobs" },
+    { href: "/manage/edit-profile", icon: FaUser, label: "Profile" },
+    { href: "/manage/settings", icon: FaCog, label: "Settings" }
   ];
 
   return (
-    <div className="flex h-screen">
-      <div className="w-64 bg-white border-r border-gray-200 shadow-md">
-        {/* <div className="flex items-center p-4">
-          <img
-            className="w-10 h-10"
-            src="images/image8.png"
-            alt="profilepic"
-          />
-          <h1 className="ml-2 text-gray-800">John Doe</h1>
-        </div> */}
-        <div className="border-b border-gray-200"></div>
-        <div className="pt-6">
-          <aside className="h-full px-3 py-4 overflow-y-auto">
-            <ul className="space-y-2 font-medium">
-              {menuItems.map((item, index) => (
-                <li key={index}>
-                  <a
-                    href={item.href}
-                    className="flex items-center p-2 text-gray-800 rounded-lg hover:bg-blue-100"
-                  >
-                    {item.icon}
-                    <span className="ml-3">{item.label}</span>
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </aside>
+    <div className="flex">
+      <div className="bg-white border-r border-gray-200 h-screen w-64 shadow-md">
+        <div className="p-4">
+          <Menu iconShape="square">
+            {menuItems.map((item, index) => (
+              <MenuItem key={index} className="hover:bg-blue-100 text-gray-800 flex items-center p-2 my-2 rounded-md">
+                <Link to={item.href} className="flex items-center">
+                  {item.icon && <item.icon className="w-5 h-5" />} {/* Ensure the icon is rendered */}
+                  <span className="ml-3">{item.label}</span>
+                </Link>
+              </MenuItem>
+            ))}
+          </Menu>
         </div>
       </div>
       <div className="flex-1 p-4">

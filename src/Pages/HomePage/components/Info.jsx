@@ -26,7 +26,7 @@ const Info = () => {
           </div>
 
 
-          <div className="flex items-center justify-between w-[170px] h-22 bg-white shadow-md rounded-lg p-4">
+          <div className="flex items-center justify-between w-[200px] h-22 bg-white shadow-md rounded-lg p-4">
           <img src="images/Icon2.png" alt="" className="w-12 h-12" />
           <div className="text-center">
             <p className="text-lg font-semibold text-black">38,47,154</p>
@@ -34,7 +34,7 @@ const Info = () => {
           </div>
         </div>
 
-        <div className="flex items-center justify-between w-[170px] h-22 bg-white shadow-md rounded-lg p-4">
+        <div className="flex items-center justify-between w-[200px] h-22 bg-white shadow-md rounded-lg p-4">
           <img src="images/Icon3.png" alt="" className="w-12 h-12" />
           <div className="text-center">
             <p className="text-lg font-semibold text-black">7,532</p>

@@ -32,7 +32,7 @@ const Search = ({ query, handleInputChange }) => {
     <div>
       <img
         src="images\homebanner.png"
-        className="w-[100vw] h-[100vh] object-cover"
+        className="w-[100vw] h-[80vh] object-cover"
         alt="image1"
       />
     </div>
@@ -45,7 +45,7 @@ const Search = ({ query, handleInputChange }) => {
      
 
       {/* Box behind the search bar */}
-      <div className="bg-white bg-opacity-20 p-2 rounded-md w-xl mt-6 xl:w-[790px]">
+      <div className="bg-white bg-opacity-20 p-2 rounded-md w-xl mt-20 xl:w-[790px]">
         <div className="bg-white p-4 rounded-md w-full">
           <form>
             <div className="flex justify-start md:flex-row flex-col md:gap-0 gap-4">
