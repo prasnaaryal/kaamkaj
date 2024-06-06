@@ -8,6 +8,7 @@ import Newsletter from '../../components/Newsletter';
 import Sidebar from '../../sidebar/Sidebar';
 import Clients from './components/Clients';
 import LastBanner from './components/LastBanner';
+import FeaturedJobs from './components/FeaturedJobs';
 
 const NewHomePage = () => {
 
@@ -124,30 +125,8 @@ const NewHomePage = () => {
     <div>
         <Search/>
         <Info/>
-        <div className="bg-white mt-10 mb-10  shadow-lg rounded-xl h-[300px] w-[350px]">
-        <h1 className="p-6 font-semibold text-lg">Featured Property</h1>
-        <div className="border-b-2"></div>
-
-        <div className="flex m-6">
-          <img
-            src="images\Icon1.png"
-            className="w-18 h-10"
-            alt="profile img"
-          />
-          <div className="p-6">
-            <h1 className="text-lg font-semibold mt-4">Westchester Village</h1>
-            <p className="text-slate-500 font-sm">July 24, 2022</p>
-            <p className="flex gap-2 mb-6">
-              <FaLocationDot className="text-teal-400 mt-1" />
-              3599 Huntz Lane
-            </p>
-            <button className="rounded-full w-14 h-7 bg-teal-200 bg-opacity-30 text-teal-500">
-              Buy
-            </button>
-          </div>
-        </div>
-      </div>
-      <div className=''>
+        <FeaturedJobs/>
+      <div className='mt-10'>
         <img src="images\Process.png" alt=""/>
       </div>
       <div>
