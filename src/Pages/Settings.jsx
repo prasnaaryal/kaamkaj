@@ -4,16 +4,15 @@ import { PiLinkSimpleLight } from "react-icons/pi";
 const Settings = () => {
   return (
     <div>
-          <div className="">
-        <h1>Change Password</h1>
-        
+      <div className="">
+        <h1 className="font-semibold">Change Password</h1>
 
-        <div className="mt-4 shadow-md border border-gray-300 rounded-lg p-4 flex items-center bg-[#E7F0FA]">
+        <div className="mt-4 shadow-md border border-gray-300 rounded-lg p-4 flex flex-col bg-[#E7F0FA]">
           <form className="space-y-6">
             <div className="flex flex-col">
               <label
                 htmlFor="companyName"
-                className="mb-2 text-sm font-medium text-gray-700"
+                className="mb-2 text-sm font-normal text-[#4F4F4F]"
               >
                 Old Password{" "}
               </label>
@@ -28,7 +27,7 @@ const Settings = () => {
               <div className="flex flex-col">
                 <label
                   htmlFor="companyAddress"
-                  className="mb-2 text-sm font-medium text-gray-700"
+                  className="mb-2 text-sm font-normal text-[#4F4F4F]"
                 >
                   New Password
                 </label>
@@ -42,7 +41,7 @@ const Settings = () => {
               <div className="flex flex-col">
                 <label
                   htmlFor="companyAddress"
-                  className="mb-2 text-sm font-medium text-gray-700"
+                  className="mb-2 text-sm font-normal text-[#4F4F4F]"
                 >
                   Confirm New Password
                 </label>
@@ -53,40 +52,32 @@ const Settings = () => {
                   placeholder="New Password"
                 />
               </div>
-
-              <div>
-             
-               </div>
             </div>
           </form>
-        </div>
-
-        <div className="mt-8">
-        <button
-            className="bg-[#0A65CC] text-white font-semibold  px-8 py-2 rounded-lg mb-4"
-          >         Save Changes
-          </button>
-        </div>
-
-        
-
-
-        
-      </div>
-
-      <div className="mt-4 shadow-md border border-gray-300 rounded-lg p-4 flex items-center bg-[#E7F0FA]">
-        <h1>Deactivate Account</h1>
-        <div className="mt-8">
-        <button
-            className="bg-red-700 text-white font-semibold  px-8 py-2 rounded-lg mb-4"
-          >         Deactivate Account
-          </button>
-        </div>
-
+          <div className=" flex mt-8">
+            <button className="bg-[#0A65CC] text-white font-semibold  px-8 py-2 rounded-lg mb-4 ">
+              {" "}
+              Save Changes
+            </button>
           </div>
-
+        </div>
       </div>
-    
+
+      <div className="mt-4 shadow-md border border-gray-300 rounded-lg p-4 flex flex-col bg-[#E7F0FA]">
+        <h1 className="font-semibold text-red-700 text-left  mb-4">
+          Deactivate Account
+        </h1>
+        <div className="flex justify-left">
+          <button className="bg-red-700 text-white font-semibold px-8 py-2 rounded-lg">
+            Deactivate Account
+          </button>
+        </div>
+        <p className="text-sm text-red-600 mt-4 left">
+          *Once you deactivate this account, there is no going back. Please be
+          certain.
+        </p>
+      </div>
+    </div>
   );
 };
 

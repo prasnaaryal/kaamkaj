@@ -33,7 +33,7 @@ console.log({handleChange})
             value=""
             onChange={handleChange}
           />
-          <span className="checkmark"></span>All time
+          <span className="checkmark px-2"></span>All time
         </label>
 
         <InputField

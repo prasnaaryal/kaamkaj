@@ -127,7 +127,7 @@ const NewHomePage = () => {
         <Info/>
         <FeaturedJobs/>
       <div className='mt-10'>
-        <img src="images\Process.png" alt=""/>
+        <img src="images\Frame 1000004984.png" alt=""/>
       </div>
       <div>
         <div className="bg-[#FAFAFA] md:grid grid-cols-4 gap-8 lg:px-24 px-4 py-12">

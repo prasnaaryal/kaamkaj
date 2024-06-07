@@ -14,7 +14,7 @@ const Location = ({ handleChange }) => {
             value=""
             onChange={handleChange}
           />
-          <span className="checkmark"></span>All
+          <span className="checkmark px-2"></span>All
         </label>
 
         <InputField

@@ -14,7 +14,7 @@ const EmploymentType = ({ handleChange }) => {
           value=""
           onChange={handleChange}
         />
-        <span className="checkmark"></span>Any type
+        <span className="checkmark px-2"></span>Any type
       </label>
 
 
