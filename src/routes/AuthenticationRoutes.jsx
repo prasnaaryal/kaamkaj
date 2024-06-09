@@ -12,16 +12,16 @@ const AuthenticationRoutes = {
   children: [
     {
       path: "",
-      element: <Home />,
+      element: <NewHomePage />,
     },
     {
       path: "trial",
       element: <Trial />,
     },
-    {
-      path: "newhome",
-      element: <NewHomePage/>,
-    },
+    // {
+    //   path: "newhome",
+    //   element: <NewHomePage/>,
+    // },
     {
       path: "salary",
       element: <SalaryPage />,
