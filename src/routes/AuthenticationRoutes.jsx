@@ -3,6 +3,7 @@ import MainLayout from "../layouts/MainLayout";
 // Pages
 import Home from "../Pages/Home";
 import NewHomePage from "../Pages/HomePage/NewHomePage";
+import JobDetail from "../Pages/JobDetail/JobDetail";
 import SalaryPage from "../Pages/SalaryPage";
 import Trial from "../Pages/Trial";
 
@@ -25,6 +26,10 @@ const AuthenticationRoutes = {
     {
       path: "salary",
       element: <SalaryPage />,
+    },
+    {
+      path: "job-detail",
+      element: <JobDetail />,
     },
   ],
 };

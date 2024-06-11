@@ -32,10 +32,7 @@ const MainRoutes = {
       path: "edit-profile",
       element: <EditProfile />,
     },
-    {
-      path: "job-detail",
-      element: <JobDetail />,
-    },
+   
     {
       path: "settings",
       element: <Settings/>,

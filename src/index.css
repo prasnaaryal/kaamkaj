@@ -2,7 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 
+
+@font-face {
+    font-family:"Regular";
+    src: local("Nunito-Regular"),
+    url('/assets/fonts/Nunito-Regular.ttf') format("truetype")
+
+}
+
 .ps-menu-button{
     width: 100%;
     border-radius: 10px;
 }
+

@@ -1,11 +1,150 @@
 import { useState } from "react";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { FaBarsStaggered, FaXmark } from "react-icons/fa6";
 import { FaArrowRight } from "react-icons/fa";
 
 import Modal from "../../../components/Modal";
+import { toast } from "react-toastify";
+import { BiHide, BiShow } from "react-icons/bi";
+import { useDispatch } from "react-redux";
 
 const Navbar = () => {
+  const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
+  const dispatch = useDispatch();
+
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [data, setData] = useState({
+    fullName: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    image: "",
+  });
+  console.log(data);
+
+  const handleShowPassword = () => {
+    setShowPassword((preve) => !preve);
+  };
+  const handleShowConfirmPassword = () => {
+    setShowConfirmPassword((preve) => !preve);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const { fullName, email, password, confirmPassword } = data;
+    if (fullName && email && password && confirmPassword) {
+      if (password === confirmPassword) {
+        console.log(data);
+        const fetchData = await fetch(
+          `${import.meta.env.VITE_BASE_URL}/auth/register`,
+          {
+            method: "POST",
+            headers: {
+              "content-type": "application/json",
+            },
+            body: JSON.stringify(data),
+          }
+        );
+
+        const dataRes = await fetchData.json();
+        console.log(dataRes);
+
+        // alert(dataRes.message);
+        toast(dataRes.message);
+        if (dataRes.alert) {
+          navigate("");
+        }
+      } else {
+        alert("password and confirm password not equal");
+      }
+    } else {
+      alert("Please Enter required fields");
+    }
+  };
+  const handleSubmit2 = async (e) => {
+    e.preventDefault();
+    const { email, password } = data;
+
+    if (!email || !password) {
+      toast.error("Please enter required fields");
+      return;
+    }
+
+    try {
+      const loginResponse = await fetch(
+        `${import.meta.env.VITE_BASE_URL}/auth/login`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        }
+      );
+
+      const loginData = await loginResponse.json();
+
+      if (!loginResponse.ok)
+        throw new Error(loginData.message || "Login failed");
+
+      toast.success(loginData.message);
+         // alert(dataRes.message);
+         toast(loginResponse.message);
+         if (loginResponse.alert) {
+           navigate("/manage/dashboard");
+         }
+       else {
+       alert("Please Enter required fields");
+     }
+
+
+      // Save accessToken to local storage
+      // if (loginData.accessToken) {
+      //   localStorage.setItem("accessToken", loginData.accessToken);
+      //   const userResponse = await fetch(
+      //     `${import.meta.env.VITE_BASE_URL}/user/load-user`,
+      //     {
+      //       method: "GET",
+      //       headers: {
+      //         Authorization: `Bearer ${loginData.accessToken}`,
+      //       },
+      //     }
+      //   );
+
+      //   const userData = await userResponse.json();
+
+      //   // if (!userResponse.ok)
+      //   //   throw new Error(userData.message || "Failed to load user data");
+
+      //   // dispatch(loginRedux({ ...loginData, user: userData }));
+
+      //   // Redirect and refresh the page based on user role
+      //   // const redirectUrl =
+      //   //   userData.user.email === process.env.REACT_APP_ADMIN_EMAIL
+      //   //     ? "/manage/dashboard"
+      //   //     : "/";
+      //   // window.location.href = redirectUrl; // This will cause the page to refresh
+      // } else {
+      //   toast.error(
+      //     loginData.alert || "Authentication failed, please try again."
+      //   );
+      // }
+    } catch (error) {
+      console.error("Login error:", error);
+      toast.error(error.message || "Login failed. Please try again.");
+    }
+  };
+
+  const handleOnChange = (e) => {
+    const { name, value } = e.target;
+    setData((preve) => {
+      return {
+        ...preve,
+        [name]: value,
+      };
+    });
+  };
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isSignupModalOpen, setIsSignupModalOpen] = useState(false);
@@ -43,12 +182,19 @@ const Navbar = () => {
     <header className="max-w-screen-2xl container mx-auto xl:px-24 px-4 border-b border-black/40">
       <nav className="flex justify-between items-center py-4 ">
         <a href="/" className="flex items-center gap-2 text-2xl">
-          <img src="/images/image.png" alt="logo" className="w-[150px] h-auto" />
+          <img
+            src="/images/image.png"
+            alt="logo"
+            className="w-[150px] h-auto"
+          />
         </a>
 
         <ul className="hidden md:flex gap-12">
           {navItems.map(({ path, title }) => (
-            <li key={path} className="text-sx text-black/70 font-medium hover:text-blue-500">
+            <li
+              key={path}
+              className="text-sx text-black/70 font-medium hover:text-blue-500"
+            >
               <NavLink
                 to={path}
                 className={({ isActive }) => (isActive ? "active" : "")}
@@ -117,28 +263,41 @@ const Navbar = () => {
           <h1 className="font-bold text-xl">Welcome to KaamKaj</h1>
           <p className="text-base text-[#545454]">Log in</p>
         </div>
-        <form>
+        <form onSubmit={handleSubmit2}>
           <div className="px-4 mt-10">
             <input
               className="border rounded-lg py-2 px-3 font-normal h-10 w-full placeholder-gray-600"
               id="email"
               type="email"
+              name="email"
               placeholder="Email"
+              value={data.email}
+              onChange={handleOnChange}
             />
           </div>
           <div className="mt-6 px-4">
             <input
+              type={showPassword ? "text" : "password"}
               className="border rounded-lg py-2 px-3 h-10 w-full placeholder-gray-600"
               id="password"
-              type="password"
+              name="password"
               placeholder="Password"
+              value={data.password}
+              onChange={handleOnChange}
             />
+            <span
+              className="flex text-xl cursor-pointer"
+              onClick={handleShowPassword}
+            >
+              {showPassword ? <BiShow /> : <BiHide />}
+            </span>
           </div>
-        </form>
-        <div className="mt-6 px-4">
           <button className="bg-blue-500 text-white font-bold py-2 px-4 rounded h-10 w-full">
             Login
           </button>
+        </form>
+        <div className="mt-6 px-4">
+          
           <div className="flex justify-between mt-4">
             <div>
               <p className="font-light text-sm">Remember me</p>
@@ -228,45 +387,72 @@ const Navbar = () => {
             <h1 className="font-bold text-xl">Welcome to KaamKaj</h1>
             <p className="text-base text-[#545454]">Sign Up as an Company</p>
           </div>
-          <form>
+          <form onSubmit={handleSubmit}>
             <div className="px-4 mt-10">
               <input
                 className="border rounded-lg py-2 px-3 font-normal h-10 w-full placeholder-gray-600"
                 id="name"
-                type="name"
+                type={"text"}
+                name="fullName"
                 placeholder="Full Name"
+                value={data.fullName}
+                onChange={handleOnChange}
               />
             </div>
             <div className="mt-6 px-4">
               <input
                 className="border rounded-lg py-2 px-3 h-10 w-full placeholder-gray-600"
                 id="email"
-                type="email"
+                type={"email"}
+                name="email"
                 placeholder="Email"
+                value={data.email}
+                onChange={handleOnChange}
               />
             </div>
             <div className="mt-6 px-4">
-              <input
-                className="border rounded-lg py-2 px-3 h-10 w-full placeholder-gray-600"
-                id="phone"
-                type="tel"
-                placeholder="Contact No"
-              />
-            </div>
-            <div className="mt-6 px-4">
+              <div className="relative">
               <input
                 className="border rounded-lg py-2 px-3 h-10 w-full placeholder-gray-600"
                 id="password"
-                type="password"
+                name="password"
+                type={showPassword ? "text" : "password"}
                 placeholder="Password"
+                value={data.password}
+                onChange={handleOnChange}
               />
+              <span
+                  className="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer"
+                  onClick={handleShowPassword}
+              >
+                {showPassword ? <BiShow /> : <BiHide />}
+              </span>
             </div>
-          </form>
-          <div className="mt-6 px-4">
-            <button className="bg-blue-500 text-white font-bold py-2 px-4 rounded h-10 w-full">
+            </div>
+            <div className="mt-6 px-4">
+              <div className="relative">
+                <input
+                  className="border rounded-lg py-2 px-3 h-10 w-full placeholder-gray-600"
+                  id="confirmpassword"
+                  type={showConfirmPassword ? "text" : "password"}
+                  name="confirmPassword"
+                  placeholder="Confirm Password"
+                  value={data.confirmPassword}
+                  onChange={handleOnChange}
+                />
+                <span
+                  className="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer"
+                  onClick={handleShowConfirmPassword}
+                >
+                  {showConfirmPassword ? <BiShow /> : <BiHide />}
+                </span>
+              </div>
+            </div>
+            <button className="bg-blue-500 text-white font-bold py-2 mt-8 px-4 rounded h-10 w-full">
               Sign Up{" "}
             </button>
-
+          </form>
+          <div className="mt-6 px-4">
             <div className="py-4 mt-4 border-t flex gap-2">
               <p className="text-sm font-light">Already have an Account?</p>
               <a
