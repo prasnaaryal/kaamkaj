@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { FaBarsStaggered, FaXmark } from "react-icons/fa6";
+import { loginRedux } from "D:/Developer/kaamkaj/src/redux/userSlice.js";
+
 import { FaArrowRight } from "react-icons/fa";
 
 import Modal from "../../../components/Modal";
@@ -89,47 +91,41 @@ const Navbar = () => {
         throw new Error(loginData.message || "Login failed");
 
       toast.success(loginData.message);
-         // alert(dataRes.message);
-         toast(loginResponse.message);
-         if (loginResponse.alert) {
-           navigate("/manage/dashboard");
-         }
-       else {
-       alert("Please Enter required fields");
-     }
-
+      // alert(dataRes.message);
+    
 
       // Save accessToken to local storage
-      // if (loginData.accessToken) {
-      //   localStorage.setItem("accessToken", loginData.accessToken);
-      //   const userResponse = await fetch(
-      //     `${import.meta.env.VITE_BASE_URL}/user/load-user`,
-      //     {
-      //       method: "GET",
-      //       headers: {
-      //         Authorization: `Bearer ${loginData.accessToken}`,
-      //       },
-      //     }
-      //   );
+      if (loginData.accessToken) {
+        localStorage.setItem("accessToken", loginData.accessToken);
+        const userResponse = await fetch(
+          `${import.meta.env.VITE_BASE_URL}/user/load-user`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${loginData.accessToken}`,
+            },
+          }
+        );
 
-      //   const userData = await userResponse.json();
+        const userData = await userResponse.json();
 
-      //   // if (!userResponse.ok)
-      //   //   throw new Error(userData.message || "Failed to load user data");
+        if (!userResponse.ok)
+          throw new Error(userData.message || "Failed to load user data");
 
-      //   // dispatch(loginRedux({ ...loginData, user: userData }));
+        dispatch(loginRedux({ ...loginData, user: userData }));
 
-      //   // Redirect and refresh the page based on user role
-      //   // const redirectUrl =
-      //   //   userData.user.email === process.env.REACT_APP_ADMIN_EMAIL
-      //   //     ? "/manage/dashboard"
-      //   //     : "/";
-      //   // window.location.href = redirectUrl; // This will cause the page to refresh
-      // } else {
-      //   toast.error(
-      //     loginData.alert || "Authentication failed, please try again."
-      //   );
-      // }
+        // Redirect and refresh the page based on user role
+        const redirectUrl =
+          userData.user.email ===
+          import.meta.env.VITE_BASE_URl.REACT_APP_ADMIN_EMAIL
+            ? "/manage/dashboard"
+            : "/";
+        window.location.href = redirectUrl; // This will cause the page to refresh
+      } else {
+        toast.error(
+          loginData.alert || "Authentication failed, please try again."
+        );
+      }
     } catch (error) {
       console.error("Login error:", error);
       toast.error(error.message || "Login failed. Please try again.");
@@ -297,7 +293,6 @@ const Navbar = () => {
           </button>
         </form>
         <div className="mt-6 px-4">
-          
           <div className="flex justify-between mt-4">
             <div>
               <p className="font-light text-sm">Remember me</p>
@@ -412,22 +407,22 @@ const Navbar = () => {
             </div>
             <div className="mt-6 px-4">
               <div className="relative">
-              <input
-                className="border rounded-lg py-2 px-3 h-10 w-full placeholder-gray-600"
-                id="password"
-                name="password"
-                type={showPassword ? "text" : "password"}
-                placeholder="Password"
-                value={data.password}
-                onChange={handleOnChange}
-              />
-              <span
+                <input
+                  className="border rounded-lg py-2 px-3 h-10 w-full placeholder-gray-600"
+                  id="password"
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Password"
+                  value={data.password}
+                  onChange={handleOnChange}
+                />
+                <span
                   className="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer"
                   onClick={handleShowPassword}
-              >
-                {showPassword ? <BiShow /> : <BiHide />}
-              </span>
-            </div>
+                >
+                  {showPassword ? <BiShow /> : <BiHide />}
+                </span>
+              </div>
             </div>
             <div className="mt-6 px-4">
               <div className="relative">
