@@ -92,7 +92,6 @@ const Navbar = () => {
 
       toast.success(loginData.message);
       // alert(dataRes.message);
-    
 
       // Save accessToken to local storage
       if (loginData.accessToken) {
@@ -116,8 +115,7 @@ const Navbar = () => {
 
         // Redirect and refresh the page based on user role
         const redirectUrl =
-          userData.user.email ===
-          import.meta.env.VITE_BASE_URl.REACT_APP_ADMIN_EMAIL
+          userData.user.email === import.meta.env.VITE_REACT_APP_ADMIN_EMAIL
             ? "/manage/dashboard"
             : "/";
         window.location.href = redirectUrl; // This will cause the page to refresh
