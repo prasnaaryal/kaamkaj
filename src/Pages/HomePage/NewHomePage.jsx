@@ -89,10 +89,10 @@ const NewHomePage = () => {
     if (selected) {
       filteredJobs = filteredJobs.filter(
         ({
+          category,
           jobLocation,
-          maxPrice,
+          maxSalary,
           experienceLevel,
-          salaryType,
           employmentType,
           postingDate,
         }) => {
@@ -101,10 +101,9 @@ const NewHomePage = () => {
           return (
             postingDateTime >= selectedTime ||
             jobLocation.toLowerCase() === selected.toLowerCase() ||
-            parseInt(maxPrice) <= parseInt(selected) ||
-            salaryType.toLowerCase() === selected.toLowerCase() ||
-            experienceLevel.toLowerCase() === selected.toLowerCase() 
-||
+            parseInt(maxSalary) <= parseInt(selected) ||
+            experienceLevel.toLowerCase() === selected.toLowerCase() ||
+            category.toLowerCase() === selected.toLowerCase() ||
             employmentType.toLowerCase() === selected.toLowerCase() 
           );
         }

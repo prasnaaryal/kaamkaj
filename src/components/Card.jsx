@@ -5,13 +5,16 @@ import { Link } from "react-router-dom";
 const Card = ({ data }) => {
   const {
     companyName,
+    category,
     jobTitle,
-    companyLogo,
-    minPrice,
-    maxPrice,
-    salaryType,
     jobLocation,
+    experienceLevel,
+    companyLogo,
+    minSalary,
+    maxSalary,
+    
     employmentType,
+    responsibilites,
     postingDate,
     description,
   } = data;
@@ -26,7 +29,7 @@ const Card = ({ data }) => {
           <div className="text-primary/70 text-base flex flex-wrap gap-2 mb-2">
             <span className="flex items-center gap-2"><FiMapPin/>{jobLocation}</span>
             <span className="flex items-center gap-2"><FiClock/>{employmentType}</span>
-            <span className="flex items-center gap-2"><FiDollarSign/>{minPrice}-{maxPrice}</span>
+            <span className="flex items-center gap-2"><FiDollarSign/>{minSalary}-{maxSalary}</span>
             <span className="flex items-center gap-2"><FiCalendar/>{postingDate}</span>
           </div>
 
