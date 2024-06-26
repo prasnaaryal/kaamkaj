@@ -42,7 +42,7 @@ const MainRoutes = {
       path: "edit-job/:id",
       element: <UpdateJob />,
       loader: ({ params }) =>
-        fetch(`http://localhost:3000/all-jobs/${params.id}`),
+        fetch(`http://localhost:9000/api/job/getalljobs/${params.id}`),
     },
     {
       path: "post-job",

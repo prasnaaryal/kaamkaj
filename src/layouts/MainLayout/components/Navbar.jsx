@@ -107,6 +107,7 @@ const Navbar = () => {
         );
 
         const userData = await userResponse.json();
+        console.log({userData})
 
         if (!userResponse.ok)
           throw new Error(userData.message || "Failed to load user data");
@@ -114,11 +115,11 @@ const Navbar = () => {
         dispatch(loginRedux({ ...loginData, user: userData }));
 
         // Redirect and refresh the page based on user role
-        const redirectUrl =
-          userData.user.email === import.meta.env.VITE_REACT_APP_ADMIN_EMAIL
-            ? "/manage/dashboard"
-            : "/";
-        window.location.href = redirectUrl; // This will cause the page to refresh
+        // const redirectUrl =
+        //   userData.user.email === import.meta.env.VITE_REACT_APP_ADMIN_EMAIL
+        //     ? "/manage/dashboard"
+        //     : "/";
+        // window.location.href = redirectUrl; // This will cause the page to refresh
       } else {
         toast.error(
           loginData.alert || "Authentication failed, please try again."

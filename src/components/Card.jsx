@@ -5,35 +5,44 @@ import { Link } from "react-router-dom";
 const Card = ({ data }) => {
   const {
     companyName,
-    category,
     jobTitle,
     jobLocation,
-    experienceLevel,
     companyLogo,
     minSalary,
     maxSalary,
-    
     employmentType,
-    responsibilites,
     postingDate,
     description,
   } = data;
-  return (
-    <section className="card">
-      <Link to={"/"} className="flex gap-4 flex-col sm:flex-row items-start">
-        <img src={companyLogo} alt="" />
-        <div>
-          <h4 className="text-primary mb-1">{companyName}</h4>
-          <h3 className="text-lg font-semibold mb-2"> {jobTitle}</h3>
 
-          <div className="text-primary/70 text-base flex flex-wrap gap-2 mb-2">
-            <span className="flex items-center gap-2"><FiMapPin/>{jobLocation}</span>
-            <span className="flex items-center gap-2"><FiClock/>{employmentType}</span>
-            <span className="flex items-center gap-2"><FiDollarSign/>{minSalary}-{maxSalary}</span>
-            <span className="flex items-center gap-2"><FiCalendar/>{postingDate}</span>
+  return (
+    <section className="bg-white border border-gray-300 rounded-lg p-6 mb-6">
+      <Link to={"/"} className="flex gap-4 items-start">
+        <img src={companyLogo} alt="" className="w-20 h-20 object-cover rounded-full" />
+        <div className="flex-1">
+          <h4 className="text-gray-700 text-sm font-semibold mb-1">{companyName}</h4>
+          <h3 className="text-xl font-bold text-gray-900 mb-2">{jobTitle}</h3>
+
+          <div className="text-black text-sm flex flex-wrap gap-4 mb-2">
+            <span className="flex items-center gap-1">
+              <FiMapPin className="text-lg text-blue-500"/>
+              {jobLocation}
+            </span>
+            <span className="flex items-center gap-1">
+              <FiClock className="text-lg text-blue-500"/>
+              {employmentType}
+            </span>
+            <span className="flex items-center gap-1">
+              <FiDollarSign className="text-lg text-blue-500"/>
+              {minSalary}-{maxSalary}
+            </span>
+            <span className="flex items-center gap-1">
+              <FiCalendar className="text-lg text-blue-500"/>
+              {postingDate}
+            </span>
           </div>
 
-          <p className="text-base text-primary/70">{description}</p>
+          <p className="text-gray-700 text-base">{description}</p>
         </div>
       </Link>
     </section>

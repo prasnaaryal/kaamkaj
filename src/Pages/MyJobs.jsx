@@ -15,7 +15,7 @@ const MyJobs = () => {
 
   useEffect(() => {
     setIsLoading(true);
-    fetch(`http://localhost:3000/myJobs/prasna123@gmail.com`)
+    fetch(`http://localhost:9000/api/job/user/prasna101@gmail.com`)
       .then((res) => res.json())
       .then((data) => {
         setJobs(data);
@@ -38,7 +38,7 @@ const MyJobs = () => {
   };
 
   const handleDelete = (id) => {
-    fetch(`http://localhost:3000/job/${id}`, {
+    fetch(`http://localhost:9000/api/job/${id}`, {
       method: "DELETE",
     })
       .then((res) => res.json())
@@ -59,6 +59,8 @@ const MyJobs = () => {
     for (let i = 1; i <= totalPages; i++) {
       pages.push(i);
     }
+
+    console.log({ jobs });
 
     return (
       <div className="flex justify-center items-center space-x-2 mt-10 mb-4">
@@ -125,8 +127,14 @@ const MyJobs = () => {
                     <th className="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
                       NO
                     </th>
-                    <th className="px-16 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
+                    <th className="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
                       Title
+                    </th>
+                    <th className="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
+                      Company Name
+                    </th>
+                    <th className="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
+                      Employment Type{" "}
                     </th>
                     <th className="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
                       Status
@@ -140,7 +148,6 @@ const MyJobs = () => {
                     <th className="px-8 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
                       Action
                     </th>
-                    
                   </tr>
                 </thead>
                 {isLoading ? (
@@ -155,15 +162,21 @@ const MyJobs = () => {
                           {index + 1}
                         </th>
                         <td className="border-t-0 px-6 align-middle border-l-0 border-r-0  whitespace-nowrap p-4">
-                         <h1 className="flex justify-center text-xs font-semibold">{job.jobTitle}</h1> 
-                         <div className="flex gap-4  text-[#5E6670] text-xs">
-                         <p className="">{job.employmentType}</p>
-                          <p className="">{job.postingDate}</p>
-
-                         </div>
-
-                         
+                          <p className="flex justify-center text-xs font-semibold">
+                            {job.jobTitle}
+                          </p>
                         </td>
+                        <td className="border-t-0 px-6 align-middle border-l-0 border-r-0  whitespace-nowrap p-4">
+                          <p className="flex justify-center text-xs font-semibold">
+                            {job.companyName}
+                          </p>
+                        </td>
+                        <td className="border-t-0 px-6 align-middle border-l-0 border-r-0  whitespace-nowrap p-4">
+                          <p className="flex justify-center text-xs font-semibold">
+                            {job.category}
+                          </p>
+                        </td>
+                        
                         <td className="border-t-0 mt-2 px-4 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 ">
                           <div className="flex space text-[#0ba02c]">
                             <SiTicktick className="text-[#0ba02c] mr-2" />
@@ -173,7 +186,7 @@ const MyJobs = () => {
                         <td className="border-t-0 mt-2 px-4 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 flex items-center">
                           <div className="flex space text-[#5E6670]">
                             <BsWallet className="text-[#0A65CC] mr-2" />$
-                            {job.minPrice}-${job.maxPrice}
+                            {job.minSalary}-${job.maxSalary}
                           </div>
                         </td>
                         <td className="border-t-0 mt-2 px-4 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
@@ -183,21 +196,21 @@ const MyJobs = () => {
                           </div>
                         </td>
                         <div>
-                        <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                          <button className="text-indigo-600 hover:underline">
-                            <Link to={`/edit-job/${job?._id}`}>
-                              <TbEdit className="text-[#0ba02c] w-4 h-4" />
-                            </Link>
-                          </button>
-                        </td>
-                        <td className=" p-4">
-                          <button
-                            onClick={() => handleDelete(job._id)}
-                            className="py-2 px-2"
-                          >
-                            <RiDeleteBinLine className="text-red-600 w-4 h-4" />
-                          </button>
-                        </td>
+                          <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                            <button className="text-indigo-600 hover:underline">
+                              <Link to={`/edit-job/${job?._id}`}>
+                                <TbEdit className="text-[#0ba02c] w-4 h-4" />
+                              </Link>
+                            </button>
+                          </td>
+                          <td className=" p-4">
+                            <button
+                              onClick={() => handleDelete(job._id)}
+                              className="py-2 px-2"
+                            >
+                              <RiDeleteBinLine className="text-red-600 w-4 h-4" />
+                            </button>
+                          </td>
                         </div>
                       </tr>
                     ))}
