@@ -1,17 +1,17 @@
 import { useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { FaBarsStaggered, FaXmark } from "react-icons/fa6";
-import { loginRedux } from "D:/Developer/kaamkaj/src/redux/userSlice.js";
-
+import { loginRedux } from "../../../redux/userSlice";
 import { FaArrowRight } from "react-icons/fa";
-
 import Modal from "../../../components/Modal";
-import { toast } from "react-toastify";
 import { BiHide, BiShow } from "react-icons/bi";
 import { useDispatch } from "react-redux";
+import axiosInstance from "../../../config/axiosConfig";
+import { useToast } from "../../../components/CustomToast";
 
 const Navbar = () => {
   const navigate = useNavigate();
+  const { addToast } = useToast();
   const [showPassword, setShowPassword] = useState(false);
   const dispatch = useDispatch();
 
@@ -23,13 +23,18 @@ const Navbar = () => {
     confirmPassword: "",
     image: "",
   });
-  console.log(data);
+
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [isSignupModalOpen, setIsSignupModalOpen] = useState(false);
+  const [forgetPasswordModal, setIsforgetPasswordModalOpen] = useState(false);
+  const [isNestedModalOpen, setIsNestedModalOpen] = useState(false);
 
   const handleShowPassword = () => {
-    setShowPassword((preve) => !preve);
+    setShowPassword((prev) => !prev);
   };
   const handleShowConfirmPassword = () => {
-    setShowConfirmPassword((preve) => !preve);
+    setShowConfirmPassword((prev) => !prev);
   };
 
   const handleSubmit = async (e) => {
@@ -37,130 +42,103 @@ const Navbar = () => {
     const { fullName, email, password, confirmPassword } = data;
     if (fullName && email && password && confirmPassword) {
       if (password === confirmPassword) {
-        console.log(data);
-        const fetchData = await fetch(
-          `${import.meta.env.VITE_BASE_URL}/auth/register`,
-          {
-            method: "POST",
-            headers: {
-              "content-type": "application/json",
-            },
-            body: JSON.stringify(data),
+        try {
+          const fetchData = await axiosInstance.post("/auth/register", data);
+          const dataRes = fetchData.data;
+          addToast(dataRes.message, "success");
+          console.log({ dataRes });
+          if (dataRes.message === "User created successfully") {
+            closeSignupModal();
+            closeNestedModal();
+            openLoginModal();
           }
-        );
-
-        const dataRes = await fetchData.json();
-        console.log(dataRes);
-
-        // alert(dataRes.message);
-        toast(dataRes.message);
-        if (dataRes.alert) {
-          navigate("");
+        } catch (error) {
+          console.error("Registration error:", error);
+          addToast(
+            error.message || "Registration failed. Please try again.",
+            "error"
+          );
         }
       } else {
-        alert("password and confirm password not equal");
+        alert("Password and confirm password do not match");
       }
     } else {
-      alert("Please Enter required fields");
+      alert("Please enter required fields");
     }
   };
+
   const handleSubmit2 = async (e) => {
     e.preventDefault();
     const { email, password } = data;
 
     if (!email || !password) {
-      toast.error("Please enter required fields");
+      addToast("Please enter required fields", "error");
       return;
     }
 
     try {
-      const loginResponse = await fetch(
-        `${import.meta.env.VITE_BASE_URL}/auth/login`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(data),
-        }
-      );
+      const loginResponse = await axiosInstance.post("/auth/login", data);
+      const loginData = loginResponse.data;
 
-      const loginData = await loginResponse.json();
+      addToast(loginData.message, "success");
 
-      if (!loginResponse.ok)
-        throw new Error(loginData.message || "Login failed");
-
-      toast.success(loginData.message);
-      // alert(dataRes.message);
-
-      // Save accessToken to local storage
       if (loginData.accessToken) {
         localStorage.setItem("accessToken", loginData.accessToken);
-        const userResponse = await fetch(
-          `${import.meta.env.VITE_BASE_URL}/user/load-user`,
-          {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${loginData.accessToken}`,
-            },
-          }
-        );
+        const userResponse = await axiosInstance.get("/user/load-user", {
+          headers: {
+            Authorization: `Bearer ${loginData.accessToken}`,
+          },
+        });
 
-        const userData = await userResponse.json();
-        console.log({userData})
-
-        if (!userResponse.ok)
-          throw new Error(userData.message || "Failed to load user data");
-
+        const userData = userResponse.data;
         dispatch(loginRedux({ ...loginData, user: userData }));
-
-        // Redirect and refresh the page based on user role
-        // const redirectUrl =
-        //   userData.user.email === import.meta.env.VITE_REACT_APP_ADMIN_EMAIL
-        //     ? "/manage/dashboard"
-        //     : "/";
-        // window.location.href = redirectUrl; // This will cause the page to refresh
+        closeLoginModal();
       } else {
-        toast.error(
-          loginData.alert || "Authentication failed, please try again."
-        );
+        addToast("Authentication failed, please try again.", "error");
       }
     } catch (error) {
       console.error("Login error:", error);
-      toast.error(error.message || "Login failed. Please try again.");
+      addToast(error.message || "Login failed. Please try again.", "error");
     }
   };
 
   const handleOnChange = (e) => {
     const { name, value } = e.target;
-    setData((preve) => {
-      return {
-        ...preve,
-        [name]: value,
-      };
-    });
+    setData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-  const [isSignupModalOpen, setIsSignupModalOpen] = useState(false);
-  const [forgetPasswordModal, setIsforgetPasswordModalOpen] = useState(false);
 
-  const [isNestedModalOpen, setIsNestedModalOpen] = useState(false);
   const openLoginModal = () => {
     setIsLoginModalOpen(true);
-    closeNestedModal();
+    setIsSignupModalOpen(false);
+    setIsNestedModalOpen(false);
   };
 
-  const openNestedModal = () => setIsNestedModalOpen(true);
-  const closeNestedModal = () => setIsNestedModalOpen(false);
+  const openNestedModal = () => {
+    setIsNestedModalOpen(true);
+  };
 
-  const openforgetPasswordModal = () => setIsforgetPasswordModalOpen(true);
+  const closeNestedModal = () => {
+    setIsNestedModalOpen(false);
+  };
 
-  const closeLoginModal = () => setIsLoginModalOpen(false);
+  const openforgetPasswordModal = () => {
+    setIsforgetPasswordModalOpen(true);
+  };
 
-  const closeSignupModal = () => setIsSignupModalOpen(false);
+  const closeLoginModal = () => {
+    setIsLoginModalOpen(false);
+  };
 
-  const closeforgetPasswordModal = () => setIsforgetPasswordModalOpen(false);
+  const closeSignupModal = () => {
+    setIsSignupModalOpen(false);
+  };
+
+  const closeforgetPasswordModal = () => {
+    setIsforgetPasswordModalOpen(false);
+  };
 
   const handleMenuToggler = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -252,7 +230,8 @@ const Navbar = () => {
       <Modal
         isOpen={isLoginModalOpen}
         onClose={closeLoginModal}
-        title="Modal Title"
+        title="Login"
+        className="max-w-lg"
       >
         <div className="flex flex-col items-center">
           <h1 className="font-bold text-xl">Welcome to KaamKaj</h1>
@@ -310,7 +289,7 @@ const Navbar = () => {
             </div>
           </div>
           <div className="py-4 mt-4 border-t flex gap-2">
-            <p className="text-sm font-light">Dont have an Account?</p>
+            <p className="text-sm font-light">{"Don't have an Account?"}</p>
             <a
               href="#"
               className="no-underline hover:underline text-blue-500 font-light text-sm"
@@ -326,11 +305,10 @@ const Navbar = () => {
       </Modal>
 
       {/* signup modal */}
-
       <Modal
         isOpen={isSignupModalOpen}
         onClose={closeSignupModal}
-        title="Modal Title"
+        title="Sign Up"
         className="w-full max-w-4xl"
       >
         <div className="flex gap-4">
@@ -373,20 +351,20 @@ const Navbar = () => {
       <Modal
         isOpen={isNestedModalOpen}
         onClose={closeNestedModal}
-        title="Nested Modal"
+        title="Sign Up"
         className="w-full max-w-md"
       >
         <div className="pb-4 px-4">
           <div className="flex flex-col items-center">
             <h1 className="font-bold text-xl">Welcome to KaamKaj</h1>
-            <p className="text-base text-[#545454]">Sign Up as an Company</p>
+            <p className="text-base text-[#545454]">Sign Up as a Company</p>
           </div>
           <form onSubmit={handleSubmit}>
             <div className="px-4 mt-10">
               <input
                 className="border rounded-lg py-2 px-3 font-normal h-10 w-full placeholder-gray-600"
                 id="name"
-                type={"text"}
+                type="text"
                 name="fullName"
                 placeholder="Full Name"
                 value={data.fullName}
@@ -397,7 +375,7 @@ const Navbar = () => {
               <input
                 className="border rounded-lg py-2 px-3 h-10 w-full placeholder-gray-600"
                 id="email"
-                type={"email"}
+                type="email"
                 name="email"
                 placeholder="Email"
                 value={data.email}
@@ -443,7 +421,7 @@ const Navbar = () => {
               </div>
             </div>
             <button className="bg-blue-500 text-white font-bold py-2 mt-8 px-4 rounded h-10 w-full">
-              Sign Up{" "}
+              Sign Up
             </button>
           </form>
           <div className="mt-6 px-4">
@@ -455,19 +433,13 @@ const Navbar = () => {
                 onClick={() => {
                   closeSignupModal();
                   closeNestedModal();
-                  setIsLoginModalOpen(true);
+                  openLoginModal();
                 }}
               >
                 Login
               </a>
             </div>
           </div>
-          {/* <button
-            className="mt-4 bg-blue-500 text-white font-semibold py-2 px-4 rounded"
-            onClick={closeNestedModal}
-          >
-            Close Nested Modal
-          </button> */}
         </div>
       </Modal>
 
@@ -504,7 +476,7 @@ const Navbar = () => {
                 className="no-underline hover:underline text-blue-500 font-light text-sm"
                 onClick={() => {
                   closeforgetPasswordModal();
-                  setIsLoginModalOpen(true);
+                  openLoginModal();
                 }}
               >
                 Back to login
