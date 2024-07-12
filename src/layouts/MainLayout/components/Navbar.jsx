@@ -1,8 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
-import { FaBarsStaggered, FaXmark } from "react-icons/fa6";
-import { loginRedux } from "../../../redux/userSlice";
+import { FaBarsStaggered, FaXmark, FaCaretDown } from "react-icons/fa6";
 import { FaArrowRight } from "react-icons/fa";
+import { IoIosArrowDown } from "react-icons/io";
+
+import { HiMiniUserCircle } from "react-icons/hi2"; // Import the icon here
+import { loginRedux } from "../../../redux/userSlice";
 import Modal from "../../../components/Modal";
 import { BiHide, BiShow } from "react-icons/bi";
 import { useDispatch } from "react-redux";
@@ -13,6 +16,7 @@ const Navbar = () => {
   const navigate = useNavigate();
   const { addToast } = useToast();
   const [showPassword, setShowPassword] = useState(false);
+  // const user = useSelector((state) => state.user);
   const dispatch = useDispatch();
 
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -29,6 +33,17 @@ const Navbar = () => {
   const [isSignupModalOpen, setIsSignupModalOpen] = useState(false);
   const [forgetPasswordModal, setIsforgetPasswordModalOpen] = useState(false);
   const [isNestedModalOpen, setIsNestedModalOpen] = useState(false);
+  const [user, setUser] = useState(null);
+  const [dropdownOpen, setDropdownOpen] = useState(false); // Dropdown state
+
+  useEffect(() => {
+    const token = localStorage.getItem("accessToken");
+    if (token) {
+      const fullName = localStorage.getItem("fullName");
+      const image = localStorage.getItem("image");
+      setUser({ fullName, image });
+    }
+  }, []);
 
   const handleShowPassword = () => {
     setShowPassword((prev) => !prev);
@@ -91,7 +106,24 @@ const Navbar = () => {
         });
 
         const userData = userResponse.data;
+        if (userData && userData.user.fullName) {
+          localStorage.setItem("fullName", userData.user.fullName);
+        }
+
+        if (userData && userData.user.image) {
+          localStorage.setItem("image", userData.user.image);
+        }
+
+        if (userData && userData.user.role) {
+          localStorage.setItem("role", userData.user.role);
+        }
+
+        console.log({ userData }, { userResponse });
         dispatch(loginRedux({ ...loginData, user: userData }));
+        setUser({
+          fullName: userData.user.fullName,
+          image: userData.user.image,
+        });
         closeLoginModal();
       } else {
         addToast("Authentication failed, please try again.", "error");
@@ -100,6 +132,15 @@ const Navbar = () => {
       console.error("Login error:", error);
       addToast(error.message || "Login failed. Please try again.", "error");
     }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("fullName");
+    localStorage.removeItem("image");
+    localStorage.removeItem("role");
+    setUser(null);
+    navigate("/");
   };
 
   const handleOnChange = (e) => {
@@ -144,6 +185,10 @@ const Navbar = () => {
     setIsMenuOpen(!isMenuOpen);
   };
 
+  const toggleDropdown = () => {
+    setDropdownOpen((prev) => !prev);
+  };
+
   const navItems = [
     { path: "/", title: "Start a Search" },
     { path: "/salary", title: "Salary Estimate" },
@@ -161,7 +206,6 @@ const Navbar = () => {
             className="w-[150px] h-auto"
           />
         </a>
-
         <ul className="hidden md:flex gap-12">
           {navItems.map(({ path, title }) => (
             <li
@@ -178,21 +222,61 @@ const Navbar = () => {
           ))}
         </ul>
 
-        <div className="text-base text-blue-400 font-medium space-x-5 hidden lg:block">
-          <button
-            className="py-2 px-5 border border-blue-500 rounded font-bold"
-            onClick={() => setIsLoginModalOpen(true)}
-          >
-            Login
-          </button>
-          <button
-            className="py-2 px-5 border rounded bg-blue-500 text-white"
-            onClick={() => setIsSignupModalOpen(true)}
-          >
-            Signup
-          </button>
-        </div>
+        <div className="text-base text-blue-400 font-medium space-x-5 hidden lg:block relative">
+          {user ? (
+            <div className="flex items-center space-x-4 relative">
+              {user.image ? (
+                <img
+                  src={user.image}
+                  alt="avatar"
+                  className="w-10 h-10 rounded-full cursor-pointer"
+                  onClick={toggleDropdown}
+                />
+              ) : (
+                <HiMiniUserCircle
+                  className="w-10 h-10  text-black/70  cursor-pointer"
+                  onClick={toggleDropdown}
+                />
+              )}
 
+              {dropdownOpen && (
+                <div className="absolute top-12 right-0 bg-white border rounded shadow-md w-48 z-50">
+                  <Link
+                    to="/dashboard"
+                    className="block px-4 py-2 text-black font-light hover:bg-gray-200"
+                    onClick={toggleDropdown}
+                  >
+                    Dashboard
+                  </Link>
+                  <button
+                    className="block w-full text-left px-4 py-2 text-black font-light hover:bg-gray-200"
+                    onClick={() => {
+                      toggleDropdown();
+                      handleLogout();
+                    }}
+                  >
+                    Logout
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <>
+              <button
+                className="py-2 px-5 border border-blue-500 rounded font-bold"
+                onClick={() => setIsLoginModalOpen(true)}
+              >
+                Login
+              </button>
+              <button
+                className="py-2 px-5 border rounded bg-blue-500 text-white"
+                onClick={() => setIsSignupModalOpen(true)}
+              >
+                Signup
+              </button>
+            </>
+          )}
+        </div>
         <div className="md:hidden block">
           <button onClick={handleMenuToggler}>
             {isMenuOpen ? (

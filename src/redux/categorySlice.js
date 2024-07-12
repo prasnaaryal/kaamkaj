@@ -10,7 +10,7 @@ export const categorySlice = createSlice({
   initialState,
   reducers: {
     setDataCategory: (state, action) => {
-      console.log({action})
+      console.log({ action });
       state.categoryList = [...action.payload.categories];
     },
   },
