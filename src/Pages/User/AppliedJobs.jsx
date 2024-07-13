@@ -111,18 +111,18 @@ const AppliedJobs = () => {
 
   return (
     <div className="max-w-screen-3xl container mx-auto 2xl:px-24 px-4">
-      <div className="my-jobs-container">
-        <div className="search-box p-2 text-center">
+      <div className="flex items-start px-2">
+        <div className="space-x-3 p-2 text-center">
           <input
             value={searchText}
             onChange={handleSearch}
             type="text"
             name="search"
             id="search"
-            className="py-2 pl-3 border focus:outline-none lg:w-4/12 mt-20 w-8"
+            className="py-2 pl-3 border focus:outline-none mt-10 w-96"
           />
           <button
-            className="bg-blue-400 text-white font-semibold px-8 py-2 rounded-sm mb-4"
+            className="bg-blue-500 text-white font-semibold px-8 py-2 rounded-sm mb-4"
             onClick={handleSearch}
           >
             Search
@@ -131,7 +131,7 @@ const AppliedJobs = () => {
       </div>
 
       <section className="py-1 bg-blueGray-50">
-        <div className="w-full xl:w-8/12 mb-12 xl:mb-0 px-4 mx-auto mt-10">
+        <div className="w-full  mb-12 xl:mb-0 px-4 mt-10">
           <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-6 shadow-lg rounded">
             <div className="block w-full overflow-x-auto">
               <table className="items-center bg-transparent w-full border-collapse">

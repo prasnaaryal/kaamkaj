@@ -86,7 +86,7 @@ const Rightbar = ({ job }) => {
           setShowApplyForm(true);
         } catch (error) {
           console.error("Error applying:", error);
-          addToast("Error applying", "error");
+          addToast("Complete your profile before applying for a job!", "error");
         }
       } else if (isSaveJob) {
         try {

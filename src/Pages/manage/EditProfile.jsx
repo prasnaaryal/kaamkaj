@@ -121,7 +121,7 @@ const EditProfile = () => {
         }
       } catch (error) {
         console.error("Error updating profile:", error);
-        addToast("Error updating profile", "error");
+        addToast("Please fill all fields!", "error");
       }
     }
   };

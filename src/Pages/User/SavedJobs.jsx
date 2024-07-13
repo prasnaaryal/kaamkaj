@@ -96,27 +96,12 @@ const SavedJobs = () => {
 
   return (
     <div className="max-w-screen-3xl container mx-auto 2xl:px-24 px-4">
-      <div className="my-jobs-container">
-        <div className="search-box p-2 text-center mb-2">
-          <input
-            value={searchText}
-            onChange={handleSearch}
-            type="text"
-            name="search"
-            id="search"
-            className="py-2 pl-3 border focus:outline-none lg:w-4/12 mt-20 w-8"
-          />
-          <button
-            className="bg-blue-400 text-white font-semibold px-8 py-2 rounded-sm mb-4"
-            onClick={handleSearch}
-          >
-            Search
-          </button>
-        </div>
+      <div className="space-y-12 mt-6">
+        <h1 className="font-semibold text-2xl">Saved Jobs</h1>
+        <div className="border-[1px] border-blue-500"></div>
       </div>
-
       <section className="py-1 bg-blueGray-50">
-        <div className="w-full xl:w-8/12 mb-12 xl:mb-0 px-4 mx-auto mt-24">
+        <div className="w-full mb-12 xl:mb-0 px-4  mt-16">
           <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-6 shadow-lg rounded">
             <div className="block w-full overflow-x-auto">
               {isLoading ? (
