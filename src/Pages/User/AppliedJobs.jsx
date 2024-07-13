@@ -99,7 +99,7 @@ const AppliedJobs = () => {
           <button
             key={page}
             onClick={() => changePage(page)}
-            className={`w-6 h-6 rounded-full flex items-center justify-center text-xs ${
+            className={`w-6 h-6 rounded-full flex items-center justify-center text-sm ${
               currentPage === page
                 ? "bg-blue-600 text-white"
                 : "bg-gray-200 text-gray-700"
@@ -148,14 +148,14 @@ const AppliedJobs = () => {
               <table className="items-center bg-transparent w-full border-collapse">
                 <thead className="bg-[#D9D9D9] bg-opacity-50 h-16 font-semibold">
                   <tr>
-                    <th className="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-1 whitespace-nowrap font-semibold text-left">
+                    <th className="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-sm uppercase border-l-0 border-r-1 whitespace-nowrap font-semibold text-left">
                       NO
                     </th>
-                    <th className="px-16 bg-blueGray-50 text-blueGray-500 align-middle text-center border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-1 whitespace-nowrap font-semibold">
+                    <th className="px-16 bg-blueGray-50 text-blueGray-500 align-middle text-center border border-solid border-blueGray-100 py-3 text-sm uppercase border-l-0 border-r-1 whitespace-nowrap font-semibold">
                       Title
                     </th>
-                    <th className="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-1 whitespace-nowrap font-semibold text-left"></th>
-                    <th className="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-1 whitespace-nowrap font-semibold text-left">
+                    <th className="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-sm uppercase border-l-0 border-r-1 whitespace-nowrap font-semibold text-left"></th>
+                    <th className="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-sm uppercase border-l-0 border-r-1 whitespace-nowrap font-semibold text-left">
                       Salary
                     </th>
                   </tr>
@@ -172,14 +172,14 @@ const AppliedJobs = () => {
                   <tbody>
                     {currentJobs.map((job, index) => (
                       <tr key={index} className="border-b">
-                        <th className="border-t-0 px-6 align-middle border-l-0 border-r-1 text-xs whitespace-nowrap p-4 text-left text-blueGray-700">
+                        <th className="border-t-0 px-6 align-middle border-l-0 border-r-1 text-sm whitespace-nowrap p-4 text-left text-blueGray-700">
                           {index + 1}
                         </th>
                         <td className="border-t-0 px-6 flex flex-col align-center border-l-0 border-r-1 whitespace-nowrap p-4">
-                          <h1 className="flex justify-center text-xs font-semibold">
+                          <h1 className="flex justify-center text-sm font-semibold">
                             {job.applicantId?.title}
                           </h1>
-                          <div className="flex items-center justify-center gap-2 text-[#5E6670] text-xs">
+                          <div className="flex items-center justify-center gap-2 text-[#5E6670] text-sm">
                             <p>{job.jobId?.employmentType}</p>
                             {"."}
                             <p>
@@ -188,8 +188,8 @@ const AppliedJobs = () => {
                             </p>
                           </div>
                         </td>
-                        <td className="border-t-0 mt-2 px-4 align-middle border-l-0 border-r-1 text-xs whitespace-nowrap p-4"></td>
-                        <td className="border-t-0 mt-2 px-4 align-middle border-l-0 border-r-1 text-xs whitespace-nowrap p-4 flex items-center">
+                        <td className="border-t-0 mt-2 px-4 align-middle border-l-0 border-r-1 text-sm whitespace-nowrap p-4"></td>
+                        <td className="border-t-0 mt-2 px-4 align-middle border-l-0 border-r-1 text-sm whitespace-nowrap p-4 flex items-center">
                           <div className="flex text-[#5E6670]">
                             <BsWallet className="text-[#0A65CC] mr-2" />
                             Rs
