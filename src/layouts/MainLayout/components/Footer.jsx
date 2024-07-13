@@ -3,14 +3,12 @@ import React, { useState } from "react";
 
 const Footer = () => {
   return (
-    <div className="w-full h-80 bg-[#18191C] p-28">
+    <div className="w-full h-80 bg-[#18191C] px-28 py-16">
       <div className=" grid grid-cols-12">
          <div className="col-span-3 flex gap-6">
-          <img className="w-28 h-8"src="images\Jendo.png" alt=""/>
-
-        
+          <img className="w-28 h-8" src="/images/Jendo.png" alt=""/>       
         </div>
-        <div className="col-span-3 flex flex-col gap-6">
+        <div className="col-span-3 flex flex-col gap-6 pb-10">
           <h1 className="text-xl font-medium leading-7 text-white ">Support</h1>
           <div className="flex flex-col gap-4">
             <p className="text-base leading-6 text-white">Kathmandu, Nepal</p>
