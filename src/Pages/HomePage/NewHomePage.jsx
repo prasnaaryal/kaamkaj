@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Search from "./components/Search";
 import Info from "./components/Info";
 import Card from "../../components/Card";
@@ -9,9 +10,11 @@ import Clients from "./components/Clients";
 import LastBanner from "./components/LastBanner";
 import FeaturedJobs from "./components/FeaturedJobs";
 import Pagination from "../../components/Pagination";
-
+import axiosInstance from "../../config/axiosConfig"; 
 
 const NewHomePage = () => {
+  const navigate = useNavigate();
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
@@ -23,10 +26,14 @@ const NewHomePage = () => {
 
   useEffect(() => {
     setIsLoading(true);
-    fetch("http://localhost:9000/api/job/getalljobs")
-      .then((res) => res.json())
-      .then((data) => {
-        setJobs(data);
+    axiosInstance
+      .get("/job/getalljobs")
+      .then((res) => {
+        setJobs(res.data);
+        setIsLoading(false);
+      })
+      .catch((error) => {
+        console.error("Error fetching jobs:", error);
         setIsLoading(false);
       });
   }, []);
@@ -71,6 +78,10 @@ const NewHomePage = () => {
     setCurrentPage(pageNumber);
   };
 
+  const handleCardClick = (id) => {
+    navigate(`/job/${id}`);
+  };
+
   const filteredData = (jobs, selected, query) => {
     let filteredJobs = jobs;
 
@@ -105,7 +116,9 @@ const NewHomePage = () => {
 
     const { startIndex, endIndex } = calculatePageRange();
     filteredJobs = filteredJobs.slice(startIndex, endIndex);
-    return filteredJobs.map((data, i) => <Card key={i} data={data} />);
+    return filteredJobs.map((data, i) => (
+      <Card key={i} data={data} onClick={handleCardClick} />
+    ));
   };
 
   const result = filteredData(jobs, selectedCategory, query);

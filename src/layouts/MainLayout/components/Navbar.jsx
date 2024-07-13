@@ -3,7 +3,6 @@ import { Link, NavLink, useNavigate } from "react-router-dom";
 import { FaBarsStaggered, FaXmark, FaCaretDown } from "react-icons/fa6";
 import { FaArrowRight } from "react-icons/fa";
 import { IoIosArrowDown } from "react-icons/io";
-
 import { HiMiniUserCircle } from "react-icons/hi2"; // Import the icon here
 import { loginRedux } from "../../../redux/userSlice";
 import Modal from "../../../components/Modal";
@@ -26,6 +25,7 @@ const Navbar = () => {
     password: "",
     confirmPassword: "",
     image: "",
+    role: "",
   });
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -54,7 +54,7 @@ const Navbar = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const { fullName, email, password, confirmPassword } = data;
+    const { fullName, email, password, confirmPassword, role } = data;
     if (fullName && email && password && confirmPassword) {
       if (password === confirmPassword) {
         try {
@@ -157,7 +157,11 @@ const Navbar = () => {
     setIsNestedModalOpen(false);
   };
 
-  const openNestedModal = () => {
+  const openNestedModal = (role) => {
+    setData((prev) => ({
+      ...prev,
+      role,
+    }));
     setIsNestedModalOpen(true);
   };
 
@@ -197,7 +201,7 @@ const Navbar = () => {
   ];
 
   return (
-    <header className="max-w-screen-2xl container mx-auto xl:px-24 px-4 border-b border-black/40">
+    <header className="w-screen xl:px-24 px-4 border-b border-black/40">
       <nav className="flex justify-between items-center py-4 ">
         <a href="/" className="flex items-center gap-2 text-2xl">
           <img
@@ -242,7 +246,7 @@ const Navbar = () => {
               {dropdownOpen && (
                 <div className="absolute top-12 right-0 bg-white border rounded shadow-md w-48 z-50">
                   <Link
-                    to="/dashboard"
+                    to="/manage/dashboard"
                     className="block px-4 py-2 text-black font-light hover:bg-gray-200"
                     onClick={toggleDropdown}
                   >
@@ -406,7 +410,7 @@ const Navbar = () => {
               <h1 className="text-xl font-medium">Become a Candidate</h1>
               <button
                 className="mt-4 bg-white text-blue-400 font-semibold py-2 px-4 h-10 w-40 flex"
-                onClick={openNestedModal}
+                onClick={() => openNestedModal("applicant")}
               >
                 Register Now <FaArrowRight className="mt-1 ml-2" />
               </button>
@@ -423,7 +427,7 @@ const Navbar = () => {
               <h1 className="text-xl font-medium">Become an Employer</h1>
               <button
                 className="mt-4 bg-white text-blue-400 font-semibold py-2 px-4 h-10 w-40 flex"
-                onClick={openNestedModal}
+                onClick={() => openNestedModal("company")}
               >
                 Register Now <FaArrowRight className="mt-1 ml-2" />
               </button>
@@ -441,7 +445,9 @@ const Navbar = () => {
         <div className="pb-4 px-4">
           <div className="flex flex-col items-center">
             <h1 className="font-bold text-xl">Welcome to KaamKaj</h1>
-            <p className="text-base text-[#545454]">Sign Up as a Company</p>
+            <p className="text-base text-[#545454]">
+              Sign Up as a {data.role === "applicant" ? "Candidate" : "Company"}
+            </p>
           </div>
           <form onSubmit={handleSubmit}>
             <div className="px-4 mt-10">

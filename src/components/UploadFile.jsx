@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { useDropzone } from "react-dropzone";
 import { IoCloudUploadOutline } from "react-icons/io5";
-import { AiOutlineFilePdf } from "react-icons/ai";
 
 const UploadFile = ({ onFileSelected, initialFile }) => {
-  const [file, setFile] = useState(initialFile || null);
+  const [file, setFile] = useState(null);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop: (acceptedFiles) => {
-      setFile(acceptedFiles[0]);
-      onFileSelected(acceptedFiles[0]);
+      if (acceptedFiles.length > 0) {
+        const selectedFile = acceptedFiles[0];
+        setFile(selectedFile);
+        onFileSelected(selectedFile);
+      }
     },
     onFileDialogCancel: () => onFileSelected(null),
     accept: {
@@ -18,11 +20,10 @@ const UploadFile = ({ onFileSelected, initialFile }) => {
   });
 
   useEffect(() => {
-    if (initialFile) {
+    if (initialFile && !file) {
       setFile(initialFile);
-      onFileSelected(initialFile);
     }
-  }, [initialFile, onFileSelected]);
+  }, [initialFile, file]);
 
   return (
     <div className="w-full">
@@ -35,23 +36,23 @@ const UploadFile = ({ onFileSelected, initialFile }) => {
           <p>Drop the file here...</p>
         ) : file ? (
           <div className="flex flex-col items-center gap-3">
-            <div>
-              {file.type.startsWith("image/") ? (
-                <div className="flex items-center w-32 h-24 justify-center rounded-md">
-                  <img
-                    src={URL.createObjectURL(file)}
-                    alt="Preview"
-                    className="w-full h-full object-cover rounded-md"
-                  />
-                </div>
+            <div className="flex items-center w-32 h-24 justify-center rounded-md">
+              {file instanceof File ? (
+                <img
+                  src={URL.createObjectURL(file)}
+                  alt="Preview"
+                  className="w-full h-full object-cover rounded-md"
+                />
               ) : (
-                <div className="flex items-center w-32 h-24 justify-center rounded-md border-2 border-primary border-dashed">
-                  <AiOutlineFilePdf className="w-8 h-8 text-primary" />
-                </div>
+                <img
+                  src={file.url}
+                  alt={file.name}
+                  className="w-full h-full object-cover rounded-md"
+                />
               )}
             </div>
             <p className="flex flex-col text-sm text-black items-center gap-2">
-              {file.name}
+              {file instanceof File ? file.name : file.name || "Profile Image"}
             </p>
           </div>
         ) : (

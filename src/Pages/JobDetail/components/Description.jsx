@@ -1,6 +1,9 @@
 import React from "react";
 
-const Description = () => {
+const Description = ({ job }) => {
+  // Split the responsibilities string into an array of points
+  const responsibilitiesArray = job.responsibilities.split(";");
+
   return (
     <div>
       <div className="bg-white mt-8 flex justify-center items-center shadow-lg rounded-xl">
@@ -8,28 +11,20 @@ const Description = () => {
           <h1 className="font-bold border-b-4 w-12 border-[#3B82F6] pt-4 ">
             Description
           </h1>
-          <p className="mt-6">
-            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Cum rerum
-            beatae consequatur, totam fugit, alias fuga aliquam quod tempora a
-            nisi esse magnam nulla quas! Error praesentium, vero dolorum
-            laborum. Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-            Cum rerum beatae consequatur, totam fugit.
-          </p>
+          <p className="mt-6">{job.description}</p>
         </div>
       </div>
 
-      <div className="bg-white mt-8 flex justify-center items-center shadow-lg rounded-xl">
+      <div className="bg-white mt-8 flex  shadow-lg rounded-xl">
         <div className="p-6 flex flex-col mb-4">
           <h1 className="font-bold border-b-4 w-12 border-[#3B82F6] pt-4 ">
-            Requirements{" "}
+            Responsibilities
           </h1>
-          <p className="mt-6">
-            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Cum rerum
-            beatae consequatur, totam fugit, alias fuga aliquam quod tempora a
-            nisi esse magnam nulla quas! Error praesentium, vero dolorum
-            laborum. Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-            Cum rerum beatae consequatur, totam fugit.
-          </p>
+          <ul className="mt-6 list-disc list-inside">
+            {responsibilitiesArray.map((responsibility, index) => (
+              <li key={index}>{responsibility.trim()}</li>
+            ))}
+          </ul>
         </div>
       </div>
     </div>

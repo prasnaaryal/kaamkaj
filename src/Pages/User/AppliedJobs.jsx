@@ -1,54 +1,67 @@
 import React, { useEffect, useState } from "react";
-import Sidebar from "../../layouts/MainLayout/components/Sidebar";
 import { SiTicktick } from "react-icons/si";
 import { BsWallet } from "react-icons/bs";
-import { FaUserFriends } from "react-icons/fa";
-import { Link } from "react-router-dom";
-import { TbEdit } from "react-icons/tb";
-import { RiDeleteBinLine } from "react-icons/ri";
+import axiosInstance from "../../config/axiosConfig";
 
 const AppliedJobs = () => {
   const [jobs, setJobs] = useState([]);
+  const [filteredJobs, setFilteredJobs] = useState([]);
   const [searchText, setSearchText] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 4;
+  const itemsPerPage = 10;
 
   useEffect(() => {
-    setIsLoading(true);
-    fetch(`http://localhost:3000/myJobs/prasna123@gmail.com`)
-      .then((res) => res.json())
-      .then((data) => {
-        setJobs(data);
+    const fetchJobs = async () => {
+      setIsLoading(true);
+      try {
+        const token = localStorage.getItem("accessToken");
+        const response = await axiosInstance.post(
+          "/job/get-applied-job-by-user",
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        setJobs(response.data);
+        setFilteredJobs(response.data);
         setIsLoading(false);
-      });
-  }, [searchText]);
+      } catch (error) {
+        console.error("Error fetching applied jobs:", error);
+        setIsLoading(false);
+      }
+    };
+
+    fetchJobs();
+  }, []);
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const itemsOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentJobs = jobs.slice(itemsOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(jobs.length / itemsPerPage);
+  const currentJobs = filteredJobs.slice(itemsOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredJobs.length / itemsPerPage);
 
-  const handleSearch = () => {
-    const filter = jobs.filter(
-      (job) =>
-        job.jobTitle.toLowerCase().indexOf(searchText.toLowerCase()) !== -1
+  const handleSearch = (e) => {
+    setSearchText(e.target.value);
+    const filtered = jobs.filter((job) =>
+      job.jobId.jobTitle.toLowerCase().includes(e.target.value.toLowerCase())
     );
-    setJobs(filter);
-    setIsLoading(false);
+    setFilteredJobs(filtered);
+    setCurrentPage(1); // Reset to the first page after search
   };
 
-  const handleDelete = (id) => {
-    fetch(`http://localhost:3000/job/${id}`, {
-      method: "DELETE",
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.acknowledged === true) {
-          alert("Job Deleted Successfully");
-          setJobs(jobs.filter((job) => job._id !== id));
-        }
-      });
+  const handleDelete = async (id) => {
+    try {
+      const response = await axiosInstance.delete(`/job/delete/${id}`);
+      if (response.data.acknowledged === true) {
+        alert("Job Deleted Successfully");
+        setJobs(jobs.filter((job) => job._id !== id));
+        setFilteredJobs(filteredJobs.filter((job) => job._id !== id));
+      }
+    } catch (error) {
+      console.error("Error deleting job:", error);
+    }
   };
 
   const changePage = (page) => {
@@ -98,10 +111,11 @@ const AppliedJobs = () => {
 
   return (
     <div className="max-w-screen-3xl container mx-auto 2xl:px-24 px-4">
-      <div className="my-jobs-container ">
-        <div className="search-box p-2 text-center mb-2">
+      <div className="my-jobs-container">
+        <div className="search-box p-2 text-center">
           <input
-            onChange={(e) => setSearchText(e.target.value)}
+            value={searchText}
+            onChange={handleSearch}
             type="text"
             name="search"
             id="search"
@@ -117,22 +131,22 @@ const AppliedJobs = () => {
       </div>
 
       <section className="py-1 bg-blueGray-50">
-        <div className="w-full xl:w-8/12 mb-12 xl:mb-0 px-4 mx-auto mt-24">
+        <div className="w-full xl:w-8/12 mb-12 xl:mb-0 px-4 mx-auto mt-10">
           <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-6 shadow-lg rounded">
             <div className="block w-full overflow-x-auto">
-              <table className="items-center bg-transparent w-full border-collapse ">
+              <table className="items-center bg-transparent w-full border-collapse">
                 <thead className="bg-[#D9D9D9] bg-opacity-50 h-16 font-semibold">
                   <tr>
-                    <th className="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
+                    <th className="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-1 whitespace-nowrap font-semibold text-left">
                       NO
                     </th>
-                    <th className="px-16 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
+                    <th className="px-16 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-1 whitespace-nowrap font-semibold text-left">
                       Title
                     </th>
-                    <th className="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
+                    <th className="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-1 whitespace-nowrap font-semibold text-left">
                       Status
                     </th>
-                    <th className="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
+                    <th className="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-1 whitespace-nowrap font-semibold text-left">
                       Salary
                     </th>
                   </tr>
@@ -141,32 +155,40 @@ const AppliedJobs = () => {
                   <div className="flex items-center justify-center">
                     <p>Loading..</p>
                   </div>
+                ) : currentJobs.length === 0 ? (
+                  <div className="flex w-full items-center justify-center">
+                    <p>No jobs found</p>
+                  </div>
                 ) : (
                   <tbody>
                     {currentJobs.map((job, index) => (
-                      <tr key={index}>
-                        <th className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 text-left text-blueGray-700">
+                      <tr key={index} className="border-b">
+                        <th className="border-t-0 px-6 align-middle border-l-0 border-r-1 text-xs whitespace-nowrap p-4 text-left text-blueGray-700">
                           {index + 1}
                         </th>
-                        <td className="border-t-0 px-6 align-middle border-l-0 border-r-0  whitespace-nowrap p-4">
+                        <td className="border-t-0 px-6 flex flex-col align-center border-l-0 border-r-1 whitespace-nowrap p-4">
                           <h1 className="flex justify-center text-xs font-semibold">
-                            {job.jobTitle}
+                            {job.jobId.jobTitle}
                           </h1>
-                          <div className="flex gap-4  text-[#5E6670] text-xs">
-                            <p className="">{job.employmentType}</p>
-                            <p className="">{job.postingDate}</p>
+                          <div className="flex items-center justify-center gap-2 text-[#5E6670] text-xs">
+                            <p>{job.jobId.employmentType}</p>
+                            {"."}
+                            <p>
+                              {new Date(job.jobId.postingDate).toDateString()}
+                            </p>
                           </div>
                         </td>
-                        <td className="border-t-0 mt-2 px-4 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 ">
-                          <div className="flex space text-[#0ba02c]">
+                        <td className="border-t-0 mt-2 px-4 align-middle border-l-0 border-r-1 text-xs whitespace-nowrap p-4">
+                          <div className="flex text-[#0ba02c]">
                             <SiTicktick className="text-[#0ba02c] mr-2" />
-                            Active
+                            {job.status}
                           </div>
                         </td>
-                        <td className="border-t-0 mt-2 px-4 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 flex items-center">
-                          <div className="flex space text-[#5E6670]">
-                            <BsWallet className="text-[#0A65CC] mr-2" />$
-                            {job.minPrice}-${job.maxPrice}
+                        <td className="border-t-0 mt-2 px-4 align-middle border-l-0 border-r-1 text-xs whitespace-nowrap p-4 flex items-center">
+                          <div className="flex text-[#5E6670]">
+                            <BsWallet className="text-[#0A65CC] mr-2" />
+                            Rs
+                            {job.jobId.minSalary}-Rs{job.jobId.maxSalary}
                           </div>
                         </td>
                       </tr>
@@ -177,11 +199,13 @@ const AppliedJobs = () => {
             </div>
           </div>
         </div>
-        <Pagination
-          totalPages={totalPages}
-          currentPage={currentPage}
-          changePage={changePage}
-        />
+        {filteredJobs.length > itemsPerPage && (
+          <Pagination
+            totalPages={totalPages}
+            currentPage={currentPage}
+            changePage={changePage}
+          />
+        )}
       </section>
     </div>
   );

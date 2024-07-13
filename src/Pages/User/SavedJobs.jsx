@@ -1,57 +1,52 @@
 import React, { useEffect, useState } from "react";
-import Sidebar from "../../layouts/MainLayout/components/Sidebar";
-import { SiTicktick } from "react-icons/si";
-import { BsWallet } from "react-icons/bs";
-import { FaUserFriends } from "react-icons/fa";
-import { Link } from "react-router-dom";
-import { TbEdit } from "react-icons/tb";
-import { RiDeleteBinLine } from "react-icons/ri";
-import { RxBookmarkFilled } from "react-icons/rx";
 import { IoLocationOutline } from "react-icons/io5";
 import { CiCalendar } from "react-icons/ci";
+import { RxBookmarkFilled } from "react-icons/rx";
+import axiosInstance from "../../config/axiosConfig";
+import { BsWallet } from "react-icons/bs";
 
 const SavedJobs = () => {
   const [jobs, setJobs] = useState([]);
+  const [filteredJobs, setFilteredJobs] = useState([]);
   const [searchText, setSearchText] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 4;
+  const itemsPerPage = 10;
 
   useEffect(() => {
-    setIsLoading(true);
-    fetch(`http://localhost:3000/myJobs/prasna123@gmail.com`)
-      .then((res) => res.json())
-      .then((data) => {
-        setJobs(data);
+    const fetchJobs = async () => {
+      setIsLoading(true);
+      try {
+        const token = localStorage.getItem("accessToken");
+        const response = await axiosInstance.get("/job/favorite/getall", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setJobs(response.data);
+        setFilteredJobs(response.data);
         setIsLoading(false);
-      });
-  }, [searchText]);
+      } catch (error) {
+        console.error("Error fetching saved jobs:", error);
+        setIsLoading(false);
+      }
+    };
+
+    fetchJobs();
+  }, []);
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const itemsOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentJobs = jobs.slice(itemsOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(jobs.length / itemsPerPage);
+  const currentJobs = filteredJobs.slice(itemsOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredJobs.length / itemsPerPage);
 
-  const handleSearch = () => {
-    const filter = jobs.filter(
-      (job) =>
-        job.jobTitle.toLowerCase().indexOf(searchText.toLowerCase()) !== -1
+  const handleSearch = (e) => {
+    setSearchText(e.target.value);
+    const filtered = jobs.filter((job) =>
+      job.jobTitle.toLowerCase().includes(e.target.value.toLowerCase())
     );
-    setJobs(filter);
-    setIsLoading(false);
-  };
-
-  const handleDelete = (id) => {
-    fetch(`http://localhost:3000/job/${id}`, {
-      method: "DELETE",
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.acknowledged === true) {
-          alert("Job Deleted Successfully");
-          setJobs(jobs.filter((job) => job._id !== id));
-        }
-      });
+    setFilteredJobs(filtered);
+    setCurrentPage(1); // Reset to the first page after search
   };
 
   const changePage = (page) => {
@@ -101,10 +96,11 @@ const SavedJobs = () => {
 
   return (
     <div className="max-w-screen-3xl container mx-auto 2xl:px-24 px-4">
-      <div className="my-jobs-container ">
+      <div className="my-jobs-container">
         <div className="search-box p-2 text-center mb-2">
           <input
-            onChange={(e) => setSearchText(e.target.value)}
+            value={searchText}
+            onChange={handleSearch}
             type="text"
             name="search"
             id="search"
@@ -123,57 +119,63 @@ const SavedJobs = () => {
         <div className="w-full xl:w-8/12 mb-12 xl:mb-0 px-4 mx-auto mt-24">
           <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-6 shadow-lg rounded">
             <div className="block w-full overflow-x-auto">
-              <table className="items-center bg-transparent w-full border-collapse ">
-                {isLoading ? (
-                  <div className="flex items-center justify-center">
-                    <p>Loading..</p>
-                  </div>
-                ) : (
-                  <tbody>
-                    {currentJobs.map((job, index) => (
-                      <tr key={index}>
-                        <th className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 text-left text-blueGray-700">
-                          {index + 1}
-                        </th>
-                        <td className="border-t-0 px-6 align-middle border-l-0 border-r-0  whitespace-nowrap p-4">
-                          <div className="flex gap-4">
-                            <h1 className="flex justify-center text-xs font-semibold">
+              {isLoading ? (
+                <div className="flex items-center justify-center">
+                  <p>Loading..</p>
+                </div>
+              ) : (
+                <div className="p-4">
+                  {currentJobs.length === 0 ? (
+                    <div className="flex items-center justify-center">
+                      <p>No jobs found</p>
+                    </div>
+                  ) : (
+                    currentJobs.map((job, index) => (
+                      <div
+                        key={index}
+                        className="flex items-center justify-between p-4 "
+                      >
+                        <div className="flex items-center">
+                          <img
+                            src={job.companyLogo || "/images/Icon1.png"}
+                            alt="Company Logo"
+                            className="w-10 h-10 mr-4"
+                          />
+                          <div>
+                            <h1 className="text-lg font-semibold">
                               {job.jobTitle}
+                              <span className="ml-2 px-2 py-1 text-sm text-blue-600 bg-blue-200 rounded">
+                                {job.employmentType}
+                              </span>
                             </h1>
-                            <p className="text-xs bg-blue-200 bg-opacity-30 rounded">
-                              {job.employmentType}
-                            </p>
-                          </div>
-                          <div className="flex gap-4  text-[#5E6670] text-xs">
-                            <p className="flex flex-row gap-2">
-                              {" "}
-                              <IoLocationOutline />
+                            <div className="flex items-center text-sm text-gray-500">
+                              <IoLocationOutline className="mr-1" />
                               {job.jobLocation}
-                            </p>
-                            <p className="flex flex-row">
-                              <CiCalendar />
-                              {job.postingDate}
-                            </p>
+                              <span className="mx-2">|</span>
+                              <BsWallet className="mr-1" />
+                              Rs{job.minSalary}-Rs{job.maxSalary}
+                              <span className="mx-2">|</span>
+                              <CiCalendar className="mr-1" />
+                              {new Date(job.postingDate).toDateString()}
+                            </div>
                           </div>
-                        </td>
-                        <td className="border-t-0 mt-2 px-4 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 ">
-                          <div className="flex ">
-                            <RxBookmarkFilled className="mr-2" />
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                )}
-              </table>
+                        </div>
+                        <RxBookmarkFilled className="text-gray-500" />
+                      </div>
+                    ))
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>
-        <Pagination
-          totalPages={totalPages}
-          currentPage={currentPage}
-          changePage={changePage}
-        />
+        {filteredJobs.length > itemsPerPage && (
+          <Pagination
+            totalPages={totalPages}
+            currentPage={currentPage}
+            changePage={changePage}
+          />
+        )}
       </section>
     </div>
   );

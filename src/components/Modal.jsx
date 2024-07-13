@@ -39,6 +39,7 @@ const Modal = ({ isOpen, onClose, title, children, className = "" }) => {
             </svg>
           </button>
         </div>
+
         <div className="p-4">{children}</div>
       </div>
     </div>

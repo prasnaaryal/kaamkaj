@@ -7,7 +7,7 @@ const Settings = () => {
       <div className="">
         <h1 className="font-semibold">Change Password</h1>
 
-        <div className="mt-4 shadow-md border border-gray-300 rounded-lg p-4 flex flex-col bg-[#E7F0FA]">
+        <div className="mt-4  border border-gray-300 rounded-lg p-4 flex flex-col">
           <form className="space-y-6">
             <div className="flex flex-col">
               <label
@@ -63,7 +63,7 @@ const Settings = () => {
         </div>
       </div>
 
-      <div className="mt-4 shadow-md border border-gray-300 rounded-lg p-4 flex flex-col bg-[#E7F0FA]">
+      <div className="mt-4  border border-gray-300 rounded-lg p-4 flex flex-col">
         <h1 className="font-semibold text-red-700 text-left  mb-4">
           Deactivate Account
         </h1>

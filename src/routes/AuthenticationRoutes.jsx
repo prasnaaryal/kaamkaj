@@ -28,7 +28,7 @@ const AuthenticationRoutes = {
       element: <SalaryPage />,
     },
     {
-      path: "job-detail",
+      path: "job/:id",
       element: <JobDetail />,
     },
   ],
