@@ -3,7 +3,7 @@ import { Link, NavLink, useNavigate } from "react-router-dom";
 import { FaBarsStaggered, FaXmark, FaCaretDown } from "react-icons/fa6";
 import { FaArrowRight } from "react-icons/fa";
 import { IoIosArrowDown } from "react-icons/io";
-import { HiMiniUserCircle } from "react-icons/hi2"; // Import the icon here
+import { HiMiniUserCircle } from "react-icons/hi2";
 import { loginRedux } from "../../../redux/userSlice";
 import Modal from "../../../components/Modal";
 import { BiHide, BiShow } from "react-icons/bi";
@@ -15,8 +15,9 @@ const Navbar = () => {
   const navigate = useNavigate();
   const { addToast } = useToast();
   const [showPassword, setShowPassword] = useState(false);
-  // const user = useSelector((state) => state.user);
   const dispatch = useDispatch();
+  const [validationErrors, setValidationErrors] = useState({});
+  const [loginError, setLoginError] = useState("");
 
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [data, setData] = useState({
@@ -34,7 +35,7 @@ const Navbar = () => {
   const [forgetPasswordModal, setIsforgetPasswordModalOpen] = useState(false);
   const [isNestedModalOpen, setIsNestedModalOpen] = useState(false);
   const [user, setUser] = useState(null);
-  const [dropdownOpen, setDropdownOpen] = useState(false); // Dropdown state
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
@@ -55,30 +56,30 @@ const Navbar = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const { fullName, email, password, confirmPassword, role } = data;
-    if (fullName && email && password && confirmPassword) {
-      if (password === confirmPassword) {
-        try {
-          const fetchData = await axiosInstance.post("/auth/register", data);
-          const dataRes = fetchData.data;
-          addToast(dataRes.message, "success");
-          console.log({ dataRes });
-          if (dataRes.message === "User created successfully") {
-            closeSignupModal();
-            closeNestedModal();
-            openLoginModal();
-          }
-        } catch (error) {
-          console.error("Registration error:", error);
-          addToast(
-            error.message || "Registration failed. Please try again.",
-            "error"
-          );
+    let errors = {};
+
+    if (!fullName || !email || !password || !confirmPassword) {
+      errors.missingFields = "Please enter required fields";
+    }
+    if (password !== confirmPassword) {
+      errors.passwordMismatch = "Password and confirm password do not match";
+    }
+
+    setValidationErrors(errors);
+
+    if (Object.keys(errors).length === 0) {
+      try {
+        const fetchData = await axiosInstance.post("/auth/register", data);
+        const dataRes = fetchData.data;
+        addToast(dataRes.message, "success");
+        if (dataRes.message === "User created successfully") {
+          closeSignupModal();
+          closeNestedModal();
+          openLoginModal();
         }
-      } else {
-        alert("Password and confirm password do not match");
+      } catch (error) {
+        console.error("Registration error:", error);
       }
-    } else {
-      alert("Please enter required fields");
     }
   };
 
@@ -86,51 +87,55 @@ const Navbar = () => {
     e.preventDefault();
     const { email, password } = data;
 
+    let errors = {};
+
     if (!email || !password) {
-      addToast("Please enter required fields", "error");
-      return;
+      errors.missingFields = "Please enter required fields";
     }
 
-    try {
-      const loginResponse = await axiosInstance.post("/auth/login", data);
-      const loginData = loginResponse.data;
+    setValidationErrors(errors);
 
-      addToast(loginData.message, "success");
+    if (Object.keys(errors).length === 0) {
+      try {
+        const loginResponse = await axiosInstance.post("/auth/login", data);
+        const loginData = loginResponse.data;
 
-      if (loginData.accessToken) {
-        localStorage.setItem("accessToken", loginData.accessToken);
-        const userResponse = await axiosInstance.get("/user/load-user", {
-          headers: {
-            Authorization: `Bearer ${loginData.accessToken}`,
-          },
-        });
+        if (loginResponse.status === 200) {
+          addToast(loginData.message, "success");
+          localStorage.setItem("accessToken", loginData.accessToken);
+          const userResponse = await axiosInstance.get("/user/load-user", {
+            headers: {
+              Authorization: `Bearer ${loginData.accessToken}`,
+            },
+          });
 
-        const userData = userResponse.data;
-        if (userData && userData.user.fullName) {
-          localStorage.setItem("fullName", userData.user.fullName);
+          const userData = userResponse.data;
+          if (userData && userData.user.fullName) {
+            localStorage.setItem("fullName", userData.user.fullName);
+          }
+
+          if (userData && userData.user.image) {
+            localStorage.setItem("image", userData.user.image);
+          }
+
+          if (userData && userData.user.role) {
+            localStorage.setItem("role", userData.user.role);
+          }
+
+          dispatch(loginRedux({ ...loginData, user: userData }));
+          setUser({
+            fullName: userData.user.fullName,
+            image: userData.user.image,
+          });
+          closeLoginModal();
+          setLoginError("");
+        } else {
+          setLoginError("Invalid email or password");
         }
-
-        if (userData && userData.user.image) {
-          localStorage.setItem("image", userData.user.image);
-        }
-
-        if (userData && userData.user.role) {
-          localStorage.setItem("role", userData.user.role);
-        }
-
-        console.log({ userData }, { userResponse });
-        dispatch(loginRedux({ ...loginData, user: userData }));
-        setUser({
-          fullName: userData.user.fullName,
-          image: userData.user.image,
-        });
-        closeLoginModal();
-      } else {
-        addToast("Authentication failed, please try again.", "error");
+      } catch (error) {
+        console.error("Login error:", error);
+        setLoginError("Invalid email or password");
       }
-    } catch (error) {
-      console.error("Login error:", error);
-      addToast(error.message || "Login failed. Please try again.", "error");
     }
   };
 
@@ -149,6 +154,12 @@ const Navbar = () => {
       ...prev,
       [name]: value,
     }));
+    setValidationErrors((prev) => ({
+      ...prev,
+      [name]: "",
+      passwordMismatch: "",
+    }));
+    setLoginError(""); // Clear login error when user starts typing
   };
 
   const openLoginModal = () => {
@@ -338,23 +349,28 @@ const Navbar = () => {
             />
           </div>
           <div className="mt-6 px-4">
-            <input
-              type={showPassword ? "text" : "password"}
-              className="border rounded-lg py-2 px-3 h-10 w-full placeholder-gray-600"
-              id="password"
-              name="password"
-              placeholder="Password"
-              value={data.password}
-              onChange={handleOnChange}
-            />
-            <span
-              className="flex text-xl cursor-pointer"
-              onClick={handleShowPassword}
-            >
-              {showPassword ? <BiShow /> : <BiHide />}
-            </span>
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                className="border rounded-lg py-2 px-3 h-10 w-full placeholder-gray-600"
+                id="password"
+                name="password"
+                placeholder="Password"
+                value={data.password}
+                onChange={handleOnChange}
+              />
+              <span
+                className="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer"
+                onClick={handleShowPassword}
+              >
+                {showPassword ? <BiShow /> : <BiHide />}
+              </span>
+            </div>
+            {loginError && (
+              <p className="text-red-500 text-sm mt-2">{loginError}</p>
+            )}
           </div>
-          <button className="bg-blue-500 text-white font-bold py-2 px-4 rounded h-10 w-full">
+          <button className="bg-blue-500 mt-3 text-white font-bold py-2 px-4 rounded h-10 w-full">
             Login
           </button>
         </form>
@@ -490,6 +506,11 @@ const Navbar = () => {
                   {showPassword ? <BiShow /> : <BiHide />}
                 </span>
               </div>
+              {validationErrors.passwordMismatch && (
+                <p className="text-red-500 text-sm mt-2">
+                  {validationErrors.passwordMismatch}
+                </p>
+              )}
             </div>
             <div className="mt-6 px-4">
               <div className="relative">
@@ -513,6 +534,11 @@ const Navbar = () => {
             <button className="bg-blue-500 text-white font-bold py-2 mt-8 px-4 rounded h-10 w-full">
               Sign Up
             </button>
+            {validationErrors.missingFields && (
+              <p className="text-red-500 text-sm mt-2">
+                {validationErrors.missingFields}
+              </p>
+            )}
           </form>
           <div className="mt-6 px-4">
             <div className="py-4 mt-4 border-t flex gap-2">
