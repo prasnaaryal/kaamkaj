@@ -37,6 +37,22 @@ const AppliedJobs = () => {
     fetchJobs();
   }, []);
 
+  useEffect(() => {
+    if (searchText.length >= 3) {
+      const filtered = jobs.filter(
+        (job) =>
+          job.applicantId &&
+          job.applicantId?.title
+            .toLowerCase()
+            .includes(searchText.toLowerCase())
+      );
+      setFilteredJobs(filtered);
+      setCurrentPage(1); // Reset to the first page after search
+    } else {
+      setFilteredJobs(jobs);
+    }
+  }, [searchText, jobs]);
+
   const indexOfLastItem = currentPage * itemsPerPage;
   const itemsOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentJobs = filteredJobs.slice(itemsOfFirstItem, indexOfLastItem);
@@ -44,13 +60,6 @@ const AppliedJobs = () => {
 
   const handleSearch = (e) => {
     setSearchText(e.target.value);
-    const filtered = jobs.filter(
-      (job) =>
-        job.jobId &&
-        job.jobId.jobTitle.toLowerCase().includes(e.target.value.toLowerCase())
-    );
-    setFilteredJobs(filtered);
-    setCurrentPage(1); // Reset to the first page after search
   };
 
   const handleDelete = async (id) => {
@@ -133,7 +142,7 @@ const AppliedJobs = () => {
       </div>
 
       <section className="py-1 bg-blueGray-50">
-        <div className="w-full  mb-12 xl:mb-0 px-4 mt-10">
+        <div className="w-full mb-12 xl:mb-0 px-4 mt-10">
           <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-6 shadow-lg rounded">
             <div className="block w-full overflow-x-auto">
               <table className="items-center bg-transparent w-full border-collapse">
