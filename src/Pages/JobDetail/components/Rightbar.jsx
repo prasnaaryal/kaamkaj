@@ -61,7 +61,7 @@ const Rightbar = ({ job }) => {
       return;
     }
     setSelectedCompanyId(companyId);
-    setShowPopup(true);
+    setShowApplyForm(true);
     setIsApplyNow(false);
     setIsSaveJob(false);
   };
@@ -77,7 +77,7 @@ const Rightbar = ({ job }) => {
       return;
     }
     setSelectedCompanyId(null);
-    setShowPopup(true);
+    setShowApplyForm(true);
     setIsApplyNow(true);
     setIsSaveJob(false);
   };
@@ -149,7 +149,7 @@ const Rightbar = ({ job }) => {
   };
 
   const handleCompanyClick = (companyId) => {
-    navigate(`/job/${companyId}`);
+    window.open(`/job/${companyId}`, "_blank");
   };
 
   return (
@@ -184,6 +184,31 @@ const Rightbar = ({ job }) => {
       <Modal
         isOpen={showConfirmApply}
         onClose={() => setShowConfirmApply(false)}
+        className="max-w-lg"
+      >
+        <div className="flex flex-col items-center justify-center mb-4 gap-4">
+          <p className="font-semibold text-2xl">Apply for the Job?</p>
+          <img src="/images/apply.png" />
+        </div>
+        <div className="flex justify-around">
+          <button
+            className="bg-blue-500 text-white py-2 px-8 rounded"
+            onClick={handleFinalApply}
+          >
+            Apply
+          </button>
+          <button
+            className="bg-white border border-blue-500 text-blue-500 py-2 px-8 rounded"
+            onClick={() => setShowConfirmApply(false)}
+          >
+            Cancel
+          </button>
+        </div>
+      </Modal>
+
+      <Modal
+        isOpen={showApplyForm}
+        onClose={() => setShowApplyForm(false)}
         className="max-w-lg"
       >
         <div className="flex flex-col p-6">
@@ -253,9 +278,12 @@ const Rightbar = ({ job }) => {
             </div>
             <button
               className="bg-blue-500 text-white py-2 px-4 rounded mt-4"
-              onClick={handleFinalApply}
+              onClick={() => {
+                setShowApplyForm(false);
+                setShowConfirmApply(true);
+              }}
             >
-              Apply
+              Confirm
             </button>
           </div>
         </div>
@@ -292,7 +320,9 @@ const Rightbar = ({ job }) => {
       </div>
 
       <div className="bg-white mt-10 space-y-3 rounded-xl w-[350px] pb-4">
-        <h1 className="p-6 font-semibold border border-b-2 border-b-black-200 shadow-sm text-lg rounded-md">Featured Companies</h1>
+        <h1 className="p-6 font-semibold border border-b-2 border-b-black-200 shadow-sm text-lg rounded-md">
+          Featured Companies
+        </h1>
 
         {featuredCompanies.map((company, index) => (
           <div
