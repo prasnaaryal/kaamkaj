@@ -14,6 +14,7 @@ const Rightbar = ({ job }) => {
   const [role, setRole] = useState("");
   const [showPopup, setShowPopup] = useState(false);
   const [showApplyForm, setShowApplyForm] = useState(false);
+  const [showConfirmApply, setShowConfirmApply] = useState(false);
   const [selectedCompanyId, setSelectedCompanyId] = useState(null);
   const [isApplyNow, setIsApplyNow] = useState(false);
   const [isSaveJob, setIsSaveJob] = useState(false);
@@ -99,26 +100,7 @@ const Rightbar = ({ job }) => {
   const handleConfirmAction = async (confirm) => {
     if (confirm && role === "applicant") {
       if (isApplyNow || selectedCompanyId) {
-        try {
-          const token = localStorage.getItem("accessToken");
-          const applyPayload = isApplyNow
-            ? { jobId: job._id }
-            : { jobId: job._id, companyId: selectedCompanyId };
-
-          await axiosInstance.post("/job/apply", applyPayload, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
-          addToast("Applied successfully", "success");
-
-          const user = await fetchUserData();
-          setShowPopup(false);
-          setShowApplyForm(true);
-        } catch (error) {
-          console.error("Error applying:", error);
-          addToast("Complete your profile before applying for a job!", "error");
-        }
+        setShowConfirmApply(true);
       } else if (isSaveJob) {
         try {
           const token = localStorage.getItem("accessToken");
@@ -138,6 +120,27 @@ const Rightbar = ({ job }) => {
       }
     } else {
       setShowPopup(false);
+    }
+  };
+
+  const handleFinalApply = async () => {
+    try {
+      const token = localStorage.getItem("accessToken");
+      const applyPayload = isApplyNow
+        ? { jobId: job._id }
+        : { jobId: job._id, companyId: selectedCompanyId };
+
+      await axiosInstance.post("/job/apply", applyPayload, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      addToast("Applied successfully", "success");
+      setShowConfirmApply(false);
+      setShowPopup(false);
+    } catch (error) {
+      console.error("Error applying:", error);
+      addToast("Error applying for the job", "error");
     }
   };
 
@@ -175,8 +178,8 @@ const Rightbar = ({ job }) => {
       </Modal>
 
       <Modal
-        isOpen={showApplyForm}
-        onClose={() => setShowApplyForm(false)}
+        isOpen={showConfirmApply}
+        onClose={() => setShowConfirmApply(false)}
         className="max-w-lg"
       >
         <div className="flex flex-col p-6">
@@ -246,10 +249,7 @@ const Rightbar = ({ job }) => {
             </div>
             <button
               className="bg-blue-500 text-white py-2 px-4 rounded mt-4"
-              onClick={() => {
-                setShowApplyForm(false);
-                handleConfirmAction(true);
-              }}
+              onClick={handleFinalApply}
             >
               Apply
             </button>
