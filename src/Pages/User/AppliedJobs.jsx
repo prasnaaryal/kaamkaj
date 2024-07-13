@@ -44,8 +44,10 @@ const AppliedJobs = () => {
 
   const handleSearch = (e) => {
     setSearchText(e.target.value);
-    const filtered = jobs.filter((job) =>
-      job.jobId.jobTitle.toLowerCase().includes(e.target.value.toLowerCase())
+    const filtered = jobs.filter(
+      (job) =>
+        job.jobId &&
+        job.jobId.jobTitle.toLowerCase().includes(e.target.value.toLowerCase())
     );
     setFilteredJobs(filtered);
     setCurrentPage(1); // Reset to the first page after search
@@ -140,12 +142,10 @@ const AppliedJobs = () => {
                     <th className="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-1 whitespace-nowrap font-semibold text-left">
                       NO
                     </th>
-                    <th className="px-16 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-1 whitespace-nowrap font-semibold text-left">
+                    <th className="px-16 bg-blueGray-50 text-blueGray-500 align-middle text-center border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-1 whitespace-nowrap font-semibold">
                       Title
                     </th>
-                    <th className="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-1 whitespace-nowrap font-semibold text-left">
-                      Status
-                    </th>
+                    <th className="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-1 whitespace-nowrap font-semibold text-left"></th>
                     <th className="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-1 whitespace-nowrap font-semibold text-left">
                       Salary
                     </th>
@@ -168,27 +168,24 @@ const AppliedJobs = () => {
                         </th>
                         <td className="border-t-0 px-6 flex flex-col align-center border-l-0 border-r-1 whitespace-nowrap p-4">
                           <h1 className="flex justify-center text-xs font-semibold">
-                            {job.jobId.jobTitle}
+                            {job.applicantId?.title}
                           </h1>
                           <div className="flex items-center justify-center gap-2 text-[#5E6670] text-xs">
-                            <p>{job.jobId.employmentType}</p>
+                            <p>{job.jobId?.employmentType}</p>
                             {"."}
                             <p>
-                              {new Date(job.jobId.postingDate).toDateString()}
+                              {job.jobId?.postingDate &&
+                                new Date(job.jobId.postingDate).toDateString()}
                             </p>
                           </div>
                         </td>
-                        <td className="border-t-0 mt-2 px-4 align-middle border-l-0 border-r-1 text-xs whitespace-nowrap p-4">
-                          <div className="flex text-[#0ba02c]">
-                            <SiTicktick className="text-[#0ba02c] mr-2" />
-                            {job.status}
-                          </div>
-                        </td>
+                        <td className="border-t-0 mt-2 px-4 align-middle border-l-0 border-r-1 text-xs whitespace-nowrap p-4"></td>
                         <td className="border-t-0 mt-2 px-4 align-middle border-l-0 border-r-1 text-xs whitespace-nowrap p-4 flex items-center">
                           <div className="flex text-[#5E6670]">
                             <BsWallet className="text-[#0A65CC] mr-2" />
                             Rs
-                            {job.jobId.minSalary}-Rs{job.jobId.maxSalary}
+                            {job.jobId?.minSalary ?? "200k"}-Rs
+                            {job.jobId?.maxSalary ?? "550k"}
                           </div>
                         </td>
                       </tr>
