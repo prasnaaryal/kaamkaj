@@ -21,14 +21,12 @@ const Rightbar = ({ job }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Fetch role from local storage
     const userRole = localStorage.getItem("role");
     setRole(userRole);
 
     axiosInstance
       .get("/job/getalljobs")
       .then((res) => {
-        // Randomly select 4 companies from the fetched data
         const companies = res.data;
         const selectedCompanies = companies
           .sort(() => 0.5 - Math.random())
@@ -40,21 +38,59 @@ const Rightbar = ({ job }) => {
       });
   }, []);
 
-  const handleApplyClick = (companyId) => {
+  const fetchUserData = async () => {
+    const token = localStorage.getItem("accessToken");
+    const userResponse = await axiosInstance.get("/user/load-user", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    setUserData(userResponse.data.user);
+    return userResponse.data.user;
+  };
+
+  const handleApplyClick = async (companyId) => {
+    if (role === "company") {
+      addToast("Only applicants can apply for jobs", "error");
+      return;
+    }
+    const user = await fetchUserData();
+    if (!user.cv) {
+      addToast("Complete your profile to apply for a job", "error");
+      return;
+    }
     setSelectedCompanyId(companyId);
     setShowPopup(true);
     setIsApplyNow(false);
     setIsSaveJob(false);
   };
 
-  const handleApplyNowClick = () => {
+  const handleApplyNowClick = async () => {
+    if (role === "company") {
+      addToast("Only applicants can apply for jobs", "error");
+      return;
+    }
+    const user = await fetchUserData();
+    if (!user.cv) {
+      addToast("Complete your profile to apply for a job", "error");
+      return;
+    }
     setSelectedCompanyId(null);
     setShowPopup(true);
     setIsApplyNow(true);
     setIsSaveJob(false);
   };
 
-  const handleSaveJobClick = () => {
+  const handleSaveJobClick = async () => {
+    if (role === "company") {
+      addToast("Only applicants can save jobs", "error");
+      return;
+    }
+    const user = await fetchUserData();
+    if (!user.cv) {
+      addToast("Complete your profile to save a job", "error");
+      return;
+    }
     setShowPopup(true);
     setIsApplyNow(false);
     setIsSaveJob(true);
@@ -76,12 +112,7 @@ const Rightbar = ({ job }) => {
           });
           addToast("Applied successfully", "success");
 
-          const userResponse = await axiosInstance.get("/user/load-user", {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
-          setUserData(userResponse.data.user);
+          const user = await fetchUserData();
           setShowPopup(false);
           setShowApplyForm(true);
         } catch (error) {
