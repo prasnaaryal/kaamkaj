@@ -291,14 +291,13 @@ const Rightbar = ({ job }) => {
         </div>
       </div>
 
-      <div className="bg-white mt-10 border border-gray-200 shadow-lg rounded-xl w-[350px] pb-4">
-        <h1 className="p-6 font-semibold text-lg">Featured Companies</h1>
-        <div className="border-b-2"></div>
+      <div className="bg-white mt-10 space-y-3 rounded-xl w-[350px] pb-4">
+        <h1 className="p-6 font-semibold border border-b-2 border-b-black-200 shadow-sm text-lg rounded-md">Featured Companies</h1>
 
         {featuredCompanies.map((company, index) => (
           <div
             key={index}
-            className="flex m-6 cursor-pointer"
+            className="flex p-6 cursor-pointer border shadow-lg"
             onClick={() => handleCompanyClick(company._id)}
           >
             <img
