@@ -1,14 +1,18 @@
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import CreatableSelect from "react-select/creatable";
-import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { useNavigate } from "react-router-dom";
+import axiosInstance from "../config/axiosConfig";
+import { useToast } from "../../src/components/CustomToast.jsx";
 
 const CreateJob = () => {
+  const { addToast } = useToast();
+  const navigate = useNavigate(); // Initialize useNavigate
   const [selectedOption, setSelectedOption] = useState(null);
   const [employmentTypes, setEmploymentTypes] = useState([]);
   const [experienceLevels, setExperienceLevels] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [companyName, setCompanyName] = useState("");
   const {
     register,
     handleSubmit,
@@ -21,65 +25,63 @@ const CreateJob = () => {
       try {
         const [employmentResponse, experienceResponse, categoriesResponse] =
           await Promise.all([
-            fetch("http://localhost:9000/api/employmentType"),
-            fetch("http://localhost:9000/api/experienceLevel"),
-            fetch("http://localhost:9000/api/category"),
+            axiosInstance.get("/employmentType"),
+            axiosInstance.get("/experienceLevel"),
+            axiosInstance.get("/category"),
           ]);
 
-        if (!employmentResponse.ok)
-          throw new Error("Employment type fetch failed");
-        if (!experienceResponse.ok)
-          throw new Error("Experience level fetch failed");
-        if (!categoriesResponse.ok) throw new Error("Categories fetch failed");
-
-        const [employmentData, experienceData, categoriesData] =
-          await Promise.all([
-            employmentResponse.json(),
-            experienceResponse.json(),
-            categoriesResponse.json(),
-          ]);
-
-        setEmploymentTypes(employmentData.employmentTypes);
-        setExperienceLevels(experienceData.experienceLevels);
-        setCategories(categoriesData.categories);
+        setEmploymentTypes(employmentResponse.data.employmentTypes);
+        setExperienceLevels(experienceResponse.data.experienceLevels);
+        setCategories(categoriesResponse.data.categories);
       } catch (error) {
         console.error("There was a problem with the fetch operation:", error);
       }
     };
 
+    const fetchUserData = async () => {
+      try {
+        const accessToken = localStorage.getItem("accessToken");
+        const userResponse = await axiosInstance.get("/user/load-user", {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+
+        setCompanyName(userResponse.data.user.fullName);
+      } catch (error) {
+        console.error("There was a problem fetching user data:", error);
+      }
+    };
+
     fetchData();
+    fetchUserData();
   }, []);
 
   const onSubmit = async (data) => {
     data.skills = selectedOption;
+    data.companyName = companyName;
 
     try {
       const accessToken = localStorage.getItem("accessToken");
-      const response = await fetch("http://localhost:9000/api/job/create-job", {
-        method: "POST",
+      const response = await axiosInstance.post("/job/create-job", data, {
         headers: {
-          "Content-Type": "application/json",
           Authorization: `Bearer ${accessToken}`,
         },
-        body: JSON.stringify(data),
       });
 
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
+      console.log(response.data); // Log the response data to check the format
 
-      const result = await response.json();
-
-      if (result.acknowledged === true) {
-        toast.success("Job Posted Successfully!");
+      if (response.status === 200) {
+        addToast("Job created successfully", "success");
         reset();
         setSelectedOption(null);
+        navigate("/manage/my-job"); // Redirect to /manage/my-job
       } else {
-        toast.error("Failed to post job");
+        addToast("Error creating job", "error");
       }
     } catch (error) {
       console.error("There was a problem with the fetch operation:", error);
-      toast.error("There was a problem with the fetch operation");
+      addToast("There was a problem with the fetch operation", "error");
     }
 
     console.log(data);
@@ -95,7 +97,7 @@ const CreateJob = () => {
 
   return (
     <div className="max-w-screen-2xl container mx-auto xl:px-24 px-4 bg-white py-10">
-      <div className="bg-gray-100 py-10 px-4 lg:px-16">
+      <div className="py-10 px-4 lg:px-16">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
             <div>
@@ -114,13 +116,10 @@ const CreateJob = () => {
               <label className="block mb-2 text-lg">Company Name</label>
               <input
                 type="text"
-                placeholder="Company Name"
-                {...register("companyName", { required: true })}
-                className="w-full p-3 border border-gray-300 rounded-md"
+                value={companyName}
+                disabled
+                className="w-full p-3 border border-gray-300 rounded-md bg-gray-100"
               />
-              {errors.companyName && (
-                <span className="text-red-500">This field is required</span>
-              )}
             </div>
           </div>
 
@@ -165,7 +164,7 @@ const CreateJob = () => {
                   </option>
                 ))}
               </select>
-              {errors.categories && (
+              {errors.category && (
                 <span className="text-red-500">This field is required</span>
               )}
             </div>
@@ -235,11 +234,23 @@ const CreateJob = () => {
           <div>
             <label className="block mb-2 text-lg">Responsibilities</label>
             <textarea
-              {...register("responsibilites", { required: true })}
+              {...register("responsibilities", { required: true })}
               placeholder="Add your job responsibilities"
               className="w-full h-56 p-3 border border-gray-300 rounded-md"
             />
-            {errors.responsibilites && (
+            {errors.responsibilities && (
+              <span className="text-red-500">This field is required</span>
+            )}
+          </div>
+
+          <div>
+            <label className="block mb-2 text-lg">Requirements</label>
+            <textarea
+              {...register("requirements", { required: true })}
+              placeholder="Add your job requirements"
+              className="w-full h-56 p-3 border border-gray-300 rounded-md"
+            />
+            {errors.requirements && (
               <span className="text-red-500">This field is required</span>
             )}
           </div>
@@ -257,10 +268,14 @@ const CreateJob = () => {
             )}
           </div>
 
-          <input
-            type="submit"
-            className="block mt-4 bg-blue-500 text-white font-semibold px-8 py-2 rounded cursor-pointer"
-          />
+          <div className="flex justify-center">
+            <button
+              type="submit"
+              className="block mt-4 bg-blue-500 text-white font-semibold px-8 py-3 rounded cursor-pointer"
+            >
+              Post Job
+            </button>
+          </div>
         </form>
       </div>
     </div>

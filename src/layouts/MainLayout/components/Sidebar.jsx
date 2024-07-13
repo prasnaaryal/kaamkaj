@@ -15,6 +15,12 @@ const Sidebar = () => {
       role: "company",
     },
     {
+      href: "/manage/post-job",
+      icon: FaBriefcase,
+      label: "Post A Job",
+      role: "company",
+    },
+    {
       href: "/manage/applied-jobs",
       icon: FaBriefcase,
       label: "Applied Jobs",

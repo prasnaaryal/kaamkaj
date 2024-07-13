@@ -13,7 +13,7 @@ const EditProfile = () => {
   const [userData, setUserData] = useState({
     id: "",
     fullName: "",
-    personalWebsite: "",
+    companyWebsite: "",
     companyAddress: "",
     aboutUs: "",
     title: "",
@@ -35,7 +35,7 @@ const EditProfile = () => {
           setUserData({
             id: user._id,
             fullName: user.fullName,
-            personalWebsite: user.personalWebsite,
+            companyWebsite: user.companyWebsite || "",
             companyAddress: user.companyAddress || "",
             aboutUs: user.aboutUs || "",
             title: user.title || "",
@@ -76,12 +76,25 @@ const EditProfile = () => {
 
         if (role === "company") {
           formData.append("fullName", userData.fullName);
-          formData.append("personalWebsite", userData.personalWebsite);
+          formData.append("companyWebsite", userData.companyWebsite);
           formData.append("companyAddress", userData.companyAddress);
           formData.append("aboutUs", userData.aboutUs);
           if (selectedImage) {
             formData.append("image", selectedImage);
           }
+
+          const response = await axiosInstance.put(
+            `/user/update-company/${userData.id}`,
+            formData,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "multipart/form-data",
+              },
+            }
+          );
+          console.log("Profile updated successfully:", response.data);
+          addToast("Profile updated successfully", "success");
         } else if (role === "applicant") {
           formData.append("fullName", userData.fullName);
           formData.append("title", userData.title);
@@ -92,20 +105,20 @@ const EditProfile = () => {
           if (selectedImage) {
             formData.append("image", selectedImage);
           }
-        }
 
-        const response = await axiosInstance.put(
-          `/user/update-profile/${userData.id}`,
-          formData,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "multipart/form-data",
-            },
-          }
-        );
-        console.log("Profile updated successfully:", response.data);
-        addToast("Profile updated successfully", "success");
+          const response = await axiosInstance.put(
+            `/user/update-profile/${userData.id}`,
+            formData,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "multipart/form-data",
+              },
+            }
+          );
+          console.log("Profile updated successfully:", response.data);
+          addToast("Profile updated successfully", "success");
+        }
       } catch (error) {
         console.error("Error updating profile:", error);
         addToast("Error updating profile", "error");
@@ -142,8 +155,9 @@ const EditProfile = () => {
                   name="fullName"
                   type="text"
                   value={userData.fullName}
-                  onChange={handleInputChange}
+                  disabled
                 />
+                <p className="text-xs text-red-500">Names cannot be edited*</p>
               </div>
               <div className="flex flex-col">
                 <label
@@ -163,7 +177,7 @@ const EditProfile = () => {
               </div>
               <div className="flex flex-col">
                 <label
-                  htmlFor="personalWebsite"
+                  htmlFor="companyWebsite"
                   className="mb-2 text-sm font-medium text-gray-700"
                 >
                   Company Website
@@ -174,10 +188,10 @@ const EditProfile = () => {
                   </span>
                   <input
                     className="border rounded py-2 pl-10 pr-3 h-10 w-full placeholder-[#9199A3]"
-                    id="personalWebsite"
-                    name="personalWebsite"
+                    id="companyWebsite"
+                    name="companyWebsite"
                     type="url"
-                    value={userData.personalWebsite}
+                    value={userData.companyWebsite}
                     onChange={handleInputChange}
                   />
                 </div>

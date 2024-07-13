@@ -5,49 +5,76 @@ import { RiDeleteBinLine } from "react-icons/ri";
 import { SiTicktick } from "react-icons/si";
 import { TbEdit } from "react-icons/tb";
 import { Link } from "react-router-dom";
+import axiosInstance from "../config/axiosConfig";
 
 const MyJobs = () => {
   const [jobs, setJobs] = useState([]);
+  const [filteredJobs, setFilteredJobs] = useState([]);
   const [searchText, setSearchText] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 4;
+  const itemsPerPage = 10;
 
   useEffect(() => {
-    setIsLoading(true);
-    fetch(`http://localhost:9000/api/job/user/prasna101@gmail.com`)
-      .then((res) => res.json())
-      .then((data) => {
-        setJobs(data);
+    const fetchJobs = async () => {
+      setIsLoading(true);
+      try {
+        const token = localStorage.getItem("accessToken");
+        const response = await axiosInstance.post(
+          "/job/getallappliedjobs",
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        setJobs(response.data);
+        setFilteredJobs(response.data);
         setIsLoading(false);
-      });
+      } catch (error) {
+        console.error("Error fetching jobs:", error);
+        setIsLoading(false);
+      }
+    };
+
+    fetchJobs();
+  }, []);
+
+  useEffect(() => {
+    if (searchText.length >= 3) {
+      handleSearch();
+    } else {
+      setFilteredJobs(jobs);
+    }
   }, [searchText]);
 
   const indexOfLastItem = currentPage * itemsPerPage;
-  const itemsOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentJobs = jobs.slice(itemsOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(jobs.length / itemsPerPage);
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentJobs = filteredJobs.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredJobs.length / itemsPerPage);
 
   const handleSearch = () => {
-    const filter = jobs.filter(
+    const filtered = jobs.filter(
       (job) =>
-        job.jobTitle.toLowerCase().indexOf(searchText.toLowerCase()) !== -1
+        job.job?.jobTitle?.toLowerCase().includes(searchText.toLowerCase()) ||
+        job.job?.companyName?.toLowerCase().includes(searchText.toLowerCase())
     );
-    setJobs(filter);
-    setIsLoading(false);
+    setFilteredJobs(filtered);
+    setCurrentPage(1); // Reset to the first page after search
   };
 
-  const handleDelete = (id) => {
-    fetch(`http://localhost:9000/api/job/${id}`, {
-      method: "DELETE",
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.acknowledged === true) {
-          alert("Job Deleted Successfully");
-          setJobs(jobs.filter((job) => job._id !== id));
-        }
-      });
+  const handleDelete = async (id) => {
+    try {
+      const response = await axiosInstance.delete(`/job/delete/${id}`);
+      if (response.data.acknowledged === true) {
+        alert("Job Deleted Successfully");
+        setJobs(jobs.filter((job) => job._id !== id));
+        setFilteredJobs(filteredJobs.filter((job) => job._id !== id));
+      }
+    } catch (error) {
+      console.error("Error deleting job:", error);
+    }
   };
 
   const changePage = (page) => {
@@ -59,8 +86,6 @@ const MyJobs = () => {
     for (let i = 1; i <= totalPages; i++) {
       pages.push(i);
     }
-
-    console.log({ jobs });
 
     return (
       <div className="flex justify-center items-center space-x-2 mt-10 mb-4">
@@ -98,7 +123,7 @@ const MyJobs = () => {
   };
 
   return (
-    <div className=" w-[75vw] mx-auto">
+    <div className="w-[75vw] mx-auto">
       <div className="">
         <div className="search-box p-2 text-center mb-2">
           <input
@@ -106,14 +131,9 @@ const MyJobs = () => {
             type="text"
             name="search"
             id="search"
-            className="py-2 pl-3 border border-blue-500 focus:outline-none  mt-20 w-[500px]"
+            className="py-2 pl-3 border border-blue-500 focus:outline-none mt-20 w-[500px]"
+            placeholder="Search by job title or company"
           />
-          <button
-            className="bg-blue-400 text-white font-semibold px-8 py-2 rounded-sm mb-4"
-            onClick={handleSearch}
-          >
-            Search
-          </button>
         </div>
       </div>
 
@@ -134,7 +154,7 @@ const MyJobs = () => {
                       Company Name
                     </th>
                     <th className="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
-                      Employment Type{" "}
+                      Employment Type
                     </th>
                     <th className="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
                       Status
@@ -154,64 +174,65 @@ const MyJobs = () => {
                   <div className="flex items-center justify-center">
                     <p>Loading..</p>
                   </div>
+                ) : filteredJobs.length === 0 ? (
+                  <div className="flex items-center justify-center">
+                    <p>No jobs found.</p>
+                  </div>
                 ) : (
                   <tbody>
                     {currentJobs.map((job, index) => (
                       <tr key={index}>
                         <th className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 text-left text-blueGray-700">
-                          {index + 1}
+                          {index + 1 + (currentPage - 1) * itemsPerPage}
                         </th>
-                        <td className="border-t-0 px-6 align-middle border-l-0 border-r-0  whitespace-nowrap p-4">
+                        <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 whitespace-nowrap p-4">
                           <p className="flex justify-center text-xs font-semibold">
-                            {job.jobTitle}
+                            {job.job?.jobTitle || "N/A"}
                           </p>
                         </td>
-                        <td className="border-t-0 px-6 align-middle border-l-0 border-r-0  whitespace-nowrap p-4">
+                        <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 whitespace-nowrap p-4">
                           <p className="flex justify-center text-xs font-semibold">
-                            {job.companyName}
+                            {job.job?.companyName || "N/A"}
                           </p>
                         </td>
-                        <td className="border-t-0 px-6 align-middle border-l-0 border-r-0  whitespace-nowrap p-4">
+                        <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 whitespace-nowrap p-4">
                           <p className="flex justify-center text-xs font-semibold">
-                            {job.category}
+                            {job.job?.employmentType || "N/A"}
                           </p>
                         </td>
-                        
-                        <td className="border-t-0 mt-2 px-4 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 ">
+                        <td className="border-t-0 mt-2 px-4 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
                           <div className="flex space text-[#0ba02c]">
                             <SiTicktick className="text-[#0ba02c] mr-2" />
-                            Active
+                            {job.status}
                           </div>
                         </td>
                         <td className="border-t-0 mt-2 px-4 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 flex items-center">
                           <div className="flex space text-[#5E6670]">
-                            <BsWallet className="text-[#0A65CC] mr-2" />$
-                            {job.minSalary}-${job.maxSalary}
+                            <BsWallet className="text-[#0A65CC] mr-2" />
+                            Rs
+                            {job.job?.minSalary || "N/A"}-Rs
+                            {job.job?.maxSalary || "N/A"}
                           </div>
                         </td>
                         <td className="border-t-0 mt-2 px-4 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
                           <div className="mr-2 flex text-xs text-[#0A65CC]">
                             <FaUserFriends className="text-[#5E6670] mr-2" />
-                            {job.companyName}
+                            {job.job?.experienceLevel || "N/A"}
                           </div>
                         </td>
-                        <div>
-                          <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                            <button className="text-indigo-600 hover:underline">
-                              <Link to={`/edit-job/${job?._id}`}>
-                                <TbEdit className="text-[#0ba02c] w-4 h-4" />
-                              </Link>
-                            </button>
-                          </td>
-                          <td className=" p-4">
-                            <button
-                              onClick={() => handleDelete(job._id)}
-                              className="py-2 px-2"
-                            >
-                              <RiDeleteBinLine className="text-red-600 w-4 h-4" />
-                            </button>
-                          </td>
-                        </div>
+                        <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 space-x-6">
+                          <button className="text-indigo-600 hover:underline">
+                            <Link to={`/edit-job/${job.job?._id}`}>
+                              <TbEdit className="text-[#0ba02c] w-4 h-4" />
+                            </Link>
+                          </button>
+                          <button
+                            onClick={() => handleDelete(job._id)}
+                            className="py-2 px-2"
+                          >
+                            <RiDeleteBinLine className="text-red-600 w-4 h-4" />
+                          </button>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
