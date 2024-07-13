@@ -1,17 +1,38 @@
-import React from "react";
-import { PiLinkSimpleLight } from "react-icons/pi";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useToast } from "../components/CustomToast";
+import Modal from "../components/Modal";
+import { GoAlertFill } from "react-icons/go";
 
 const Settings = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const navigate = useNavigate();
+  const { addToast } = useToast();
+
+  const handleDeactivateClick = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleConfirmDeactivation = () => {
+    // Logic to deactivate account
+    // This could be an API call to deactivate the account
+    // After deactivation, log out the user and show a toast message
+
+    // For demonstration purposes, we'll just clear localStorage and navigate to login
+    localStorage.clear();
+    addToast("Account deactivated", "success");
+    navigate("/");
+  };
+
   return (
     <div>
       <div className="">
         <h1 className="font-semibold">Change Password</h1>
-
-        <div className="mt-4  border border-gray-300 rounded-lg p-4 flex flex-col">
+        <div className="mt-4 border border-gray-300 rounded-lg p-4 flex flex-col">
           <form className="space-y-6">
             <div className="flex flex-col">
               <label
-                htmlFor="companyName"
+                htmlFor="oldPassword"
                 className="mb-2 text-sm font-normal text-[#4F4F4F]"
               >
                 Old Password{" "}
@@ -19,56 +40,58 @@ const Settings = () => {
               <input
                 className="border rounded py-2 px-3 font-normal h-10 w-72 placeholder-[#9199A3]"
                 id="oldPassword"
-                type="text"
+                type="password"
                 placeholder="*****"
               />
             </div>
             <div className="flex gap-6">
               <div className="flex flex-col">
                 <label
-                  htmlFor="companyAddress"
+                  htmlFor="newPassword"
                   className="mb-2 text-sm font-normal text-[#4F4F4F]"
                 >
                   New Password
                 </label>
                 <input
                   className="border rounded py-2 px-3 h-10 w-72 placeholder-[#9199A3]"
-                  id="companyAddress"
-                  type="text"
+                  id="newPassword"
+                  type="password"
                   placeholder="New Password"
                 />
               </div>
               <div className="flex flex-col">
                 <label
-                  htmlFor="companyAddress"
+                  htmlFor="confirmNewPassword"
                   className="mb-2 text-sm font-normal text-[#4F4F4F]"
                 >
                   Confirm New Password
                 </label>
                 <input
                   className="border rounded py-2 px-3 h-10 w-72 placeholder-[#9199A3]"
-                  id="companyAddress"
-                  type="text"
-                  placeholder="New Password"
+                  id="confirmNewPassword"
+                  type="password"
+                  placeholder="Confirm New Password"
                 />
               </div>
             </div>
           </form>
-          <div className=" flex mt-8">
-            <button className="bg-[#0A65CC] text-white font-semibold  px-8 py-2 rounded-lg mb-4 ">
-              {" "}
+          <div className="flex mt-8">
+            <button className="bg-[#0A65CC] text-white font-semibold px-8 py-2 rounded-lg mb-4">
               Save Changes
             </button>
           </div>
         </div>
       </div>
 
-      <div className="mt-4  border border-gray-300 rounded-lg p-4 flex flex-col">
-        <h1 className="font-semibold text-red-700 text-left  mb-4">
+      <div className="mt-4 border border-gray-300 rounded-lg p-4 flex flex-col">
+        <h1 className="font-semibold text-red-700 text-left mb-4">
           Deactivate Account
         </h1>
         <div className="flex justify-left">
-          <button className="bg-red-700 text-white font-semibold px-8 py-2 rounded-lg">
+          <button
+            className="bg-red-700 text-white font-semibold px-8 py-2 rounded-lg"
+            onClick={handleDeactivateClick}
+          >
             Deactivate Account
           </button>
         </div>
@@ -77,6 +100,35 @@ const Settings = () => {
           certain.
         </p>
       </div>
+
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        className="max-w-md"
+      >
+        <div className="text-center">
+          <h2 className="text-2xl font-semibold mb-4">
+            Are you sure you want to delete your account?
+          </h2>
+          <div className="flex justify-center items-center mb-4">
+            <GoAlertFill className="text-red-500 w-12 h-12" />
+          </div>
+          <div className="flex justify-center space-x-36">
+            <button
+              className="bg-blue-500 text-white px-8 py-2 rounded"
+              onClick={() => setIsModalOpen(false)}
+            >
+              No
+            </button>
+            <button
+              className="bg-red-500 text-white px-8 py-2 rounded"
+              onClick={handleConfirmDeactivation}
+            >
+              Yes
+            </button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 };
