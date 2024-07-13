@@ -148,6 +148,10 @@ const Rightbar = ({ job }) => {
     navigate("/manage/edit-profile");
   };
 
+  const handleCompanyClick = (companyId) => {
+    navigate(`/job/${companyId}`);
+  };
+
   return (
     <div>
       <Modal
@@ -257,7 +261,7 @@ const Rightbar = ({ job }) => {
         </div>
       </Modal>
 
-      <div className="bg-white shadow-lg rounded-xl h-44 w-[350px]">
+      <div className="bg-white border border-gray-200 shadow-lg rounded-xl h-44 w-[350px]">
         <div className="flex p-6 gap-10">
           <button
             size="lg"
@@ -287,12 +291,16 @@ const Rightbar = ({ job }) => {
         </div>
       </div>
 
-      <div className="bg-white mt-10 shadow-lg rounded-xl w-[350px] pb-4">
+      <div className="bg-white mt-10 border border-gray-200 shadow-lg rounded-xl w-[350px] pb-4">
         <h1 className="p-6 font-semibold text-lg">Featured Companies</h1>
         <div className="border-b-2"></div>
 
         {featuredCompanies.map((company, index) => (
-          <div key={index} className="flex m-6">
+          <div
+            key={index}
+            className="flex m-6 cursor-pointer"
+            onClick={() => handleCompanyClick(company._id)}
+          >
             <img
               src={company.companyLogo || "/images/Icon1.png"}
               className="w-18 h-10"
@@ -309,7 +317,10 @@ const Rightbar = ({ job }) => {
               </p>
               <button
                 className="rounded-full w-14 h-7 bg-teal-200 bg-opacity-30 text-teal-500"
-                onClick={() => handleApplyClick(company._id)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleApplyClick(company._id);
+                }}
               >
                 Apply
               </button>

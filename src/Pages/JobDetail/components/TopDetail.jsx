@@ -5,9 +5,9 @@ import { IoBed } from "react-icons/io5";
 
 const TopDetail = ({ job }) => {
   return (
-    <div className="bg-white shadow-lg">
+    <div className="bg-white border border-gray-200 shadow-lg rounded-xl">
       <button
-        className="rounded-full h-7 w-14 bg-green-500 bg-opacity-20 text-teal-500 font-xl m-4 "
+        className="rounded-full h-7 w-20 bg-green-500 bg-opacity-20 text-teal-500 font-xl m-4 px-2"
         size="lg"
       >
         {job.employmentType}
