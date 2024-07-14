@@ -172,7 +172,7 @@ const SavedJobs = () => {
                           </div>
                         </div>
                         <RxBookmarkFilled
-                          className="text-gray-500 cursor-pointer"
+                          className="text-gray-500 cursor-pointer w-6 h-6"
                           onClick={() => unsaveJob(job._id)}
                         />
                       </div>
