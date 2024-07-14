@@ -19,6 +19,7 @@ const EditProfile = () => {
     title: "",
     cv: "",
     image: "",
+    personalWebsite: "", // Ensure this is included
   });
 
   useEffect(() => {
@@ -41,6 +42,7 @@ const EditProfile = () => {
             title: user.title || "",
             cv: user.cv || "",
             image: user.image,
+            personalWebsite: user.personalWebsite || "", // Set this value
           });
           setRole(user.role);
         } catch (error) {
@@ -98,7 +100,7 @@ const EditProfile = () => {
         } else if (role === "applicant") {
           formData.append("fullName", userData.fullName);
           formData.append("title", userData.title);
-          formData.append("personalWebsite", userData.personalWebsite);
+          formData.append("personalWebsite", userData.personalWebsite); // Append this value
           if (selectedFile) {
             formData.append("cv", selectedFile);
           }
