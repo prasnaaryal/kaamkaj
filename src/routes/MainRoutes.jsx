@@ -32,17 +32,15 @@ const MainRoutes = {
       path: "edit-profile",
       element: <EditProfile />,
     },
-   
+
     {
       path: "settings",
-      element: <Settings/>,
+      element: <Settings />,
     },
-   
+
     {
       path: "edit-job/:id",
       element: <UpdateJob />,
-      loader: ({ params }) =>
-        fetch(`http://localhost:9000/api/job/getalljobs/${params.id}`),
     },
     {
       path: "post-job",

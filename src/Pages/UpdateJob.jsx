@@ -1,38 +1,114 @@
-import React from 'react'
-import  { useState } from "react";
-import { useForm } from 'react-hook-form';
-import CreatableSelect from 'react-select/creatable';
-
-
-import { useLoaderData, useParams } from 'react-router-dom'
+import React, { useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import CreatableSelect from "react-select/creatable";
+import { useNavigate, useParams } from "react-router-dom";
+import axiosInstance from "../config/axiosConfig";
+import { useToast } from "../../src/components/CustomToast.jsx";
 
 const UpdateJob = () => {
-    const [selectedOption, setSelectedOption] = useState(null);
+  const { addToast } = useToast();
+  const navigate = useNavigate();
+  const { id } = useParams(); // Get the job id from the URL
+  const [selectedOption, setSelectedOption] = useState([]);
+  const [employmentTypes, setEmploymentTypes] = useState([]);
+  const [experienceLevels, setExperienceLevels] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [companyName, setCompanyName] = useState("");
   const {
     register,
     handleSubmit,
+    setValue, // Add setValue to set form values
     reset,
-
     formState: { errors },
   } = useForm();
 
-  const onSubmit = (data) => {
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [employmentResponse, experienceResponse, categoriesResponse] =
+          await Promise.all([
+            axiosInstance.get("/employmentType"),
+            axiosInstance.get("/experienceLevel"),
+            axiosInstance.get("/category"),
+          ]);
+
+        setEmploymentTypes(employmentResponse.data.employmentTypes);
+        setExperienceLevels(experienceResponse.data.experienceLevels);
+        setCategories(categoriesResponse.data.categories);
+      } catch (error) {
+        console.error("There was a problem with the fetch operation:", error);
+      }
+    };
+
+    const fetchUserData = async () => {
+      try {
+        const accessToken = localStorage.getItem("accessToken");
+        const userResponse = await axiosInstance.get("/user/load-user", {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+
+        setCompanyName(userResponse.data.user.fullName);
+      } catch (error) {
+        console.error("There was a problem fetching user data:", error);
+      }
+    };
+
+    const fetchJobData = async () => {
+      try {
+        const response = await axiosInstance.get(`/job/${id}`);
+        const jobData = response.data;
+        // Set form values with the fetched job data
+        setValue("jobTitle", jobData.jobTitle);
+        setValue("minSalary", jobData.minSalary);
+        setValue("maxSalary", jobData.maxSalary);
+        setValue("category", jobData.category);
+        setValue("jobLocation", jobData.jobLocation);
+        setValue("experienceLevel", jobData.experienceLevel);
+        setValue("employmentType", jobData.employmentType);
+        setValue("description", jobData.description);
+        setValue("responsibilities", jobData.responsibilities);
+        setValue("requirements", jobData.requirements);
+        setValue("postedBy", jobData.postedBy);
+        setSelectedOption(jobData.skills || []); // Set skills if they exist
+      } catch (error) {
+        console.error("There was a problem fetching job data:", error);
+      }
+    };
+
+    fetchData();
+    fetchUserData();
+    fetchJobData();
+  }, [id, setValue]);
+
+  const onSubmit = async (data) => {
     data.skills = selectedOption;
-    fetch(`http://localhost:9000/api/job/update-job/${id}`, {
-      method: "PATCH",
-      headers: {
-        "content-type": "application/json",
-      },
-      body: JSON.stringify(data),
-    })
-      .then((res) => res.json())
-      .then((result) => {
-        console.log(result);
-        if(result.acknowledged === true){
-          alert("Job Updated Successfully!")
-        }
-        reset()
+    data.companyName = companyName;
+
+    try {
+      const accessToken = localStorage.getItem("accessToken");
+      const response = await axiosInstance.put(`/job/update-job/${id}`, data, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
       });
+
+      console.log(response.data); // Log the response data to check the format
+
+      if (response.status === 200) {
+        addToast("Job updated successfully", "success");
+        reset();
+        setSelectedOption([]);
+        navigate("/manage/my-job"); // Redirect to /manage/my-job
+      } else {
+        addToast("Error updating job", "error");
+      }
+    } catch (error) {
+      console.error("There was a problem with the update operation:", error);
+      addToast("There was a problem with the update operation", "error");
+    }
+
     console.log(data);
   };
 
@@ -43,203 +119,192 @@ const UpdateJob = () => {
     { value: "React", label: "React" },
     { value: "MongoDB", label: "MongoDB" },
   ];
-    const{id}=useParams();
-    const {_id,jobTitle,companyName,minPrice,maxPrice,salaryType,jobLocation,postingDate,experienceLevel,companyLogo,employmentType,description,postedBy,skills}=useLoaderData()
+
   return (
-    <div className="max-w-screen-2xl container mx-auto xl:px-24 px-4">
-      {/* form */}
-      <div className="bg-[#FAFAFA] py-10 px-4 lg:px-16">
+    <div className="max-w-screen-2xl container mx-auto xl:px-24 px-4 bg-white py-10">
+      <div className="py-10 px-4 lg:px-16">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-          <div className="create-job-flex">
-            <div className="lg:w-1/2 w-full">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+            <div>
               <label className="block mb-2 text-lg">Job Title</label>
               <input
                 type="text"
-                defaultValue={jobTitle}
-                {...register("jobTitle")}
-                className="create-job-input"
+                placeholder="Job Title"
+                {...register("jobTitle", { required: true })}
+                className="w-full p-3 border border-gray-300 rounded-md"
               />
+              {errors.jobTitle && (
+                <span className="text-red-500">This field is required</span>
+              )}
             </div>
-
-            <div className="lg:w-1/2 w-full">
+            <div>
               <label className="block mb-2 text-lg">Company Name</label>
               <input
                 type="text"
-                // placeholder="Ex:Microsoft"
-                defaultValue={companyName}
-
-                {...register("companyName")}
-                className="create-job-input"
+                value={companyName}
+                disabled
+                className="w-full p-3 border border-gray-300 rounded-md bg-gray-100"
               />
             </div>
           </div>
 
-          {/* 2nd row */}
-
-          <div className="create-job-flex">
-            <div className="lg:w-1/2 w-full">
-              <label className="block mb-2 text-lg">Minimum Salaray</label>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+            <div>
+              <label className="block mb-2 text-lg">Minimum Salary</label>
               <input
                 type="text"
-                defaultValue={maxPrice}
-
-                // placeholder="$20k"
-                {...register("minPrice")}
-                className="create-job-input"
+                placeholder="Rs20k"
+                {...register("minSalary", { required: true })}
+                className="w-full p-3 border border-gray-300 rounded-md"
               />
+              {errors.minSalary && (
+                <span className="text-red-500">This field is required</span>
+              )}
             </div>
-
-            <div className="lg:w-1/2 w-full">
+            <div>
               <label className="block mb-2 text-lg">Maximum Salary</label>
               <input
                 type="text"
-                placeholder="$120k"
-                defaultValue={maxPrice}
-
-                {...register("maxPrice")}
-                className="create-job-input"
+                placeholder="Rs80k"
+                {...register("maxSalary", { required: true })}
+                className="w-full p-3 border border-gray-300 rounded-md"
               />
+              {errors.maxSalary && (
+                <span className="text-red-500">This field is required</span>
+              )}
             </div>
           </div>
 
-          {/* 3rd row */}
-
-          <div className="create-job-flex">
-            <div className="lg:w-1/2 w-full">
-              <label className="block mb-2 text-lg">Salary Type</label>
-
-
-              <select {...register("salaryType")} className="create-job-input">
-                <option value={salaryType}>{salaryType}</option>
-                <option value="Hourly">Hourly</option>
-                <option value="Monthly">Monthly</option>
-                <option value="Yearly">Yearly</option>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+            <div>
+              <label className="block mb-2 text-lg">Categories</label>
+              <select
+                {...register("category", { required: true })}
+                className="w-full p-3 border border-gray-300 rounded-md"
+              >
+                <option value="">Select Option</option>
+                {categories.map((category) => (
+                  <option key={category} value={category}>
+                    {category}
+                  </option>
+                ))}
               </select>
+              {errors.category && (
+                <span className="text-red-500">This field is required</span>
+              )}
             </div>
-
-            <div className="lg:w-1/2 w-full">
+            <div>
               <label className="block mb-2 text-lg">Job Location</label>
               <input
                 type="text"
-                defaultValue={jobLocation}
-
-                placeholder="Ex:New York"
-                {...register("jobLocation")}
-                className="create-job-input"
+                placeholder="Ex: Kathmandu"
+                {...register("jobLocation", { required: true })}
+                className="w-full p-3 border border-gray-300 rounded-md"
               />
+              {errors.jobLocation && (
+                <span className="text-red-500">This field is required</span>
+              )}
             </div>
           </div>
 
-          {/* 4th row */}
-
-          <div className="create-job-flex">
-            <div className="lg:w-1/2 w-full">
-              <label className="block mb-2 text-lg">Job Posting Date</label>
-
-              <input
-                type="date"
-                placeholder="Ex:2023-10-28"
-                defaultValue={postingDate}
-
-                {...register("postingDate")}
-                className="create-job-input"
-              />
-            </div>
-
-            <div className="lg:w-1/2 w-full">
-              <label className="block mb-2 text-lg">Experience level</label>
-
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+            <div>
+              <label className="block mb-2 text-lg">Experience Level</label>
               <select
-                {...register("experienceLevel")}
-                className="create-job-input"
+                {...register("experienceLevel", { required: true })}
+                className="w-full p-3 border border-gray-300 rounded-md"
               >
-                <option value={experienceLevel}>{experienceLevel}</option>
-                <option value="Hourly">Hourly</option>
-                <option value="Internship">Internship</option>
-                <option value="Work remotely">Work Remotely</option>
+                <option value="">Select Option</option>
+                {experienceLevels.map((level) => (
+                  <option key={level} value={level}>
+                    {level}
+                  </option>
+                ))}
               </select>
+              {errors.experienceLevel && (
+                <span className="text-red-500">This field is required</span>
+              )}
+            </div>
+            <div>
+              <label className="block mb-2 text-lg">Employment Type</label>
+              <select
+                {...register("employmentType", { required: true })}
+                className="w-full p-3 border border-gray-300 rounded-md"
+              >
+                <option value="">Select Option</option>
+                {employmentTypes.map((type) => (
+                  <option key={type} value={type}>
+                    {type}
+                  </option>
+                ))}
+              </select>
+              {errors.employmentType && (
+                <span className="text-red-500">This field is required</span>
+              )}
             </div>
           </div>
-
-          {/* 5h row */}
 
           <div>
-            <label className="block mb-2 text-lg">Required skill sets:</label>
-            <CreatableSelect
-              defaultValue={skills}
-              onChange={(selectedOptions) => setSelectedOption(selectedOptions)}
-              options={options}
-              isMulti
-              className="create-job-input py-4"
-            />
-          </div>
-
-          {/* 6throw */}
-          <div className="create-job-flex">
-            <div className="lg:w-1/2 w-full">
-              <label className="block mb-2 text-lg">Company logo</label>
-
-              <input
-                type="url"
-                defaultValue={companyLogo}
-
-                placeholder="Paste your company logo url"
-                {...register("companyLogo")}
-                className="create-job-input"
-              />
-            </div>
-
-            <div className="lg:w-1/2 w-full">
-              <label className="block mb-2 text-lg">Employment Type</label>
-             
-
-              <select
-                {...register("employmentType")}
-                className="create-job-input"
-              >
-                
-                <option value={employmentType}>{employmentType}</option>
-                <option value="Full-time">Full-time</option>
-                <option value="Part-time">Part-time</option>
-                <option value="Temporary">Temporary</option>
-              </select>
-            </div>
-          </div>
-
-          {/* 7throw */}
-          <div className="w-full">
             <label className="block mb-2 text-lg">Job Description</label>
             <textarea
-              className="w-full pl-3 py-1.5 focus:outline-none placeholder:text-gray-700"
-              rows={6}
-              defaultValue={description}
-              placeholder="Job Description"
-              {...register("description")}
+              {...register("description", { required: true })}
+              placeholder="Add your job description"
+              className="w-full h-56 p-3 border border-gray-300 rounded-md"
             />
+            {errors.description && (
+              <span className="text-red-500">This field is required</span>
+            )}
           </div>
 
-          {/* last row */}
+          <div>
+            <label className="block mb-2 text-lg">Responsibilities</label>
+            <textarea
+              {...register("responsibilities", { required: true })}
+              placeholder="Add your job responsibilities"
+              className="w-full h-56 p-3 border border-gray-300 rounded-md"
+            />
+            {errors.responsibilities && (
+              <span className="text-red-500">This field is required</span>
+            )}
+          </div>
+
+          <div>
+            <label className="block mb-2 text-lg">Requirements</label>
+            <textarea
+              {...register("requirements", { required: true })}
+              placeholder="Add your job requirements"
+              className="w-full h-56 p-3 border border-gray-300 rounded-md"
+            />
+            {errors.requirements && (
+              <span className="text-red-500">This field is required</span>
+            )}
+          </div>
 
           <div>
             <label className="block mb-2 text-lg">Job Posted By</label>
             <input
               type="email"
-              defaultValue={postedBy}
-
               placeholder="your email"
-              {...register("postedBy")}
-              className="create-job-input"
+              {...register("postedBy", { required: true })}
+              className="w-full p-3 border border-gray-300 rounded-md"
             />
+            {errors.postedBy && (
+              <span className="text-red-500">This field is required</span>
+            )}
           </div>
 
-          <input
-            type="submit"
-            className="block mt-12 bg-blue-500 text-white font-semibold px-8 py-2 rounded-sm cursor-pointer"
-          />
+          <div className="flex justify-center">
+            <button
+              type="submit"
+              className="block mt-4 bg-blue-500 text-white font-semibold px-8 py-3 rounded cursor-pointer"
+            >
+              Update Job
+            </button>
+          </div>
         </form>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default UpdateJob
+export default UpdateJob;
