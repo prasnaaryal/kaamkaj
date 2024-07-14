@@ -40,6 +40,13 @@ const Description = ({ job }) => {
           </ul>
         </div>
       </div>
+
+      <div className="bg-white mt-8 flex">
+        <div className="p-6 flex flex-col mb-4">
+          <h1 className="font-bold pt-4 ">Posted By:</h1>
+          <ul className="mt-6 list-disc list-inside">{job.postedBy}</ul>
+        </div>
+      </div>
     </div>
   );
 };
