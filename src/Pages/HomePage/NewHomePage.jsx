@@ -191,17 +191,26 @@ const NewHomePage = () => {
     );
   });
 
+  // Function to shuffle an array
+  const shuffleArray = (array) => {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+  };
+
+  // Shuffle the filtered jobs
+  const shuffledJobs = shuffleArray([...filteredJobsByFilters]);
+
   const calculatePageRange = () => {
     const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = Math.min(
-      startIndex + itemsPerPage,
-      filteredJobsByFilters.length
-    );
+    const endIndex = Math.min(startIndex + itemsPerPage, shuffledJobs.length);
     return { startIndex, endIndex };
   };
 
   const nextPage = () => {
-    if (currentPage < Math.ceil(filteredJobsByFilters.length / itemsPerPage)) {
+    if (currentPage < Math.ceil(shuffledJobs.length / itemsPerPage)) {
       setCurrentPage(currentPage + 1);
     }
   };
@@ -221,8 +230,8 @@ const NewHomePage = () => {
   };
 
   const { startIndex, endIndex } = calculatePageRange();
-  const paginatedJobs = filteredJobsByFilters.slice(startIndex, endIndex);
-  const totalPages = Math.ceil(filteredJobsByFilters.length / itemsPerPage);
+  const paginatedJobs = shuffledJobs.slice(startIndex, endIndex);
+  const totalPages = Math.ceil(shuffledJobs.length / itemsPerPage);
 
   const handleLastBannerSearchClick = () => {
     searchSectionRef.current.scrollIntoView({ behavior: "smooth" });
