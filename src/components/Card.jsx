@@ -21,7 +21,7 @@ const Card = ({ data, onClick }) => {
     >
       <div className="flex gap-4 items-start">
         <img
-          src={companyLogo}
+          src={companyLogo ? companyLogo : "/images/Icon1.png"}
           alt=""
           className="w-20 h-20 object-cover rounded-full"
         />
