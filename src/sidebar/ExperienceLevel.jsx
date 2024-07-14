@@ -1,12 +1,12 @@
 import React from "react";
 import InputField from "../components/InputFieldFilter";
 
-const employmentTypes = ["Remote", "Hybrid", "On-Site"];
+const experienceLevels = ["Senior", "Mid", "Junior", "Intern"];
 
-const EmploymentType = ({ selectedFilters, handleChange }) => {
+const ExperienceLevel = ({ selectedFilters, handleChange }) => {
   return (
     <div>
-      <h4 className="text-lg font-medium mb-2">Employment Type</h4>
+      <h4 className="text-lg font-medium mb-2">Experience Level</h4>
       <div className="flex flex-col gap-2">
         <InputField
           handleChange={handleChange}
@@ -14,13 +14,13 @@ const EmploymentType = ({ selectedFilters, handleChange }) => {
           title="All"
           checked={selectedFilters.includes("all")}
         />
-        {employmentTypes.map((type) => (
+        {experienceLevels.map((level) => (
           <InputField
-            key={type}
+            key={level}
             handleChange={handleChange}
-            value={type.toLowerCase()}
-            title={type}
-            checked={selectedFilters.includes(type.toLowerCase())}
+            value={level.toLowerCase()}
+            title={level}
+            checked={selectedFilters.includes(level.toLowerCase())}
           />
         ))}
       </div>
@@ -28,4 +28,4 @@ const EmploymentType = ({ selectedFilters, handleChange }) => {
   );
 };
 
-export default EmploymentType;
+export default ExperienceLevel;

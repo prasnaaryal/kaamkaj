@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Search from "./components/Search";
 import Info from "./components/Info";
-import Card from "../../components/Card";
 import Jobs from "../Jobs";
 import Newsletter from "../../components/Newsletter";
 import Sidebar from "../../sidebar/Sidebar";
@@ -10,15 +9,19 @@ import Clients from "./components/Clients";
 import LastBanner from "./components/LastBanner";
 import FeaturedJobs from "./components/FeaturedJobs";
 import Pagination from "../../components/Pagination";
-import axiosInstance from "../../config/axiosConfig"; 
+import axiosInstance from "../../config/axiosConfig";
 
 const NewHomePage = () => {
   const navigate = useNavigate();
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const openModal = () => setIsModalOpen(true);
-  const closeModal = () => setIsModalOpen(false);
-  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [selectedFilters, setSelectedFilters] = useState({
+    category: [],
+    salary: [],
+    date: [],
+    employmentType: [],
+    experienceLevel: [],
+  });
+
   const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [jobs, setJobs] = useState([]);
@@ -43,27 +46,97 @@ const NewHomePage = () => {
     setQuery(event.target.value);
   };
 
-  const filteredItems = jobs.filter(
-    (job) => job.jobTitle.toLowerCase().indexOf(query.toLowerCase()) !== -1
-  );
-
-  const handleChange = (event) => {
-    setSelectedCategory(event.target.value);
-    console.log({ event });
+  const handleFilterChange = (category, value) => {
+    setSelectedFilters((prevState) => {
+      const isChecked = prevState[category].includes(value);
+      if (value === "" && category === "salary") {
+        return {
+          ...prevState,
+          [category]: isChecked ? [] : [value],
+        };
+      } else {
+        return {
+          ...prevState,
+          [category]: isChecked
+            ? prevState[category].filter((item) => item !== value)
+            : [...prevState[category], value],
+        };
+      }
+    });
   };
 
-  const handleClick = (event) => {
-    setSelectedCategory(event.target.value);
+  const handleCategoryChange = (event) => {
+    handleFilterChange("category", event.target.value);
   };
+
+  const handleSalaryChange = (event) => {
+    handleFilterChange("salary", event.target.value);
+  };
+
+  const handleDateChange = (event) => {
+    handleFilterChange("date", event.target.value);
+  };
+
+  const handleEmploymentTypeChange = (event) => {
+    handleFilterChange("employmentType", event.target.value);
+  };
+
+  const handleExperienceLevelChange = (event) => {
+    handleFilterChange("experienceLevel", event.target.value);
+  };
+
+  const salaryFilter = (job, salary) => {
+    if (salary === "") return true;
+    const [min, max] = salary.split("-").map(Number);
+    return parseInt(job.maxSalary) >= min && parseInt(job.maxSalary) <= max;
+  };
+
+  const filteredJobs = jobs.filter((job) => {
+    const queryMatch = job.jobTitle.toLowerCase().includes(query.toLowerCase());
+    const categoryMatch = selectedFilters.category.length
+      ? selectedFilters.category.includes(job.category)
+      : true;
+    const salaryMatch = selectedFilters.salary.length
+      ? selectedFilters.salary.includes("") ||
+        selectedFilters.salary.some((salary) => salaryFilter(job, salary))
+      : true;
+    const dateMatch = selectedFilters.date.length
+      ? selectedFilters.date.includes("") ||
+        selectedFilters.date.some(
+          (date) => new Date(job.postingDate) >= new Date(date)
+        )
+      : true;
+    const employmentTypeMatch = selectedFilters.employmentType.length
+      ? selectedFilters.employmentType.includes("all") ||
+        selectedFilters.employmentType.includes(
+          job.employmentType.toLowerCase()
+        )
+      : true;
+    const experienceLevelMatch = selectedFilters.experienceLevel.length
+      ? selectedFilters.experienceLevel.includes("all") ||
+        selectedFilters.experienceLevel.includes(
+          job.experienceLevel.toLowerCase()
+        )
+      : true;
+
+    return (
+      queryMatch &&
+      categoryMatch &&
+      salaryMatch &&
+      dateMatch &&
+      employmentTypeMatch &&
+      experienceLevelMatch
+    );
+  });
 
   const calculatePageRange = () => {
     const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = Math.min(startIndex + itemsPerPage, filteredItems.length);
+    const endIndex = Math.min(startIndex + itemsPerPage, filteredJobs.length);
     return { startIndex, endIndex };
   };
 
   const nextPage = () => {
-    if (currentPage < Math.ceil(filteredItems.length / itemsPerPage)) {
+    if (currentPage < Math.ceil(filteredJobs.length / itemsPerPage)) {
       setCurrentPage(currentPage + 1);
     }
   };
@@ -82,52 +155,13 @@ const NewHomePage = () => {
     navigate(`/job/${id}`);
   };
 
-  const filteredData = (jobs, selected, query) => {
-    let filteredJobs = jobs;
-
-    if (query) {
-      filteredJobs = filteredItems;
-    }
-
-    if (selected) {
-      filteredJobs = filteredJobs.filter(
-        ({
-          category,
-          jobLocation,
-          maxSalary,
-          experienceLevel,
-          employmentType,
-          postingDate,
-        }) => {
-          const postingDateTime = new Date(postingDate).getTime();
-          const selectedTime = new Date(selected).getTime();
-          return (
-            postingDateTime >= selectedTime ||
-            jobLocation.toLowerCase() === selected.toLowerCase() ||
-            parseInt(maxSalary) <= parseInt(selected) ||
-            experienceLevel.toLowerCase() === selected.toLowerCase() ||
-            category.toLowerCase() === selected.toLowerCase() ||
-            employmentType.toLowerCase() === selected.toLowerCase()
-          );
-        }
-      );
-      console.log({ selected });
-    }
-
-    const { startIndex, endIndex } = calculatePageRange();
-    filteredJobs = filteredJobs.slice(startIndex, endIndex);
-    return filteredJobs.map((data, i) => (
-      <Card key={i} data={data} onClick={handleCardClick} />
-    ));
-  };
-
-  const result = filteredData(jobs, selectedCategory, query);
-
-  const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
+  const { startIndex, endIndex } = calculatePageRange();
+  const paginatedJobs = filteredJobs.slice(startIndex, endIndex);
+  const totalPages = Math.ceil(filteredJobs.length / itemsPerPage);
 
   return (
     <div>
-      <Search />
+      <Search query={query} handleInputChange={handleInputChange} />
       <Info />
       <FeaturedJobs />
       <div className="mt-10">
@@ -136,20 +170,27 @@ const NewHomePage = () => {
       <div>
         <div className="bg-[#FAFAFA] md:grid grid-cols-4 gap-8 lg:px-24 px-4 py-12">
           <div className="bg-white p-4 rounded">
-            <Sidebar handleChange={handleChange} handleClick={handleClick} />
+            <Sidebar
+              selectedFilters={selectedFilters}
+              handleCategoryChange={handleCategoryChange}
+              handleSalaryChange={handleSalaryChange}
+              handleDateChange={handleDateChange}
+              handleEmploymentTypeChange={handleEmploymentTypeChange}
+              handleExperienceLevelChange={handleExperienceLevelChange}
+            />
           </div>
           <div className="col-span-2 bg-white p-4 rounded-sm">
             {isLoading ? (
               <p className="font-medium">Loading....</p>
-            ) : result.length > 0 ? (
-              <Jobs result={result} />
+            ) : paginatedJobs.length > 0 ? (
+              <Jobs result={paginatedJobs} handleCardClick={handleCardClick} />
             ) : (
               <>
-                <h3 className="text-lg font-bold mb-2">{result.length} Jobs</h3>
+                <h3 className="text-lg font-bold mb-2">0 Jobs</h3>
                 <p>No data found</p>
               </>
             )}
-            {result.length > 0 && (
+            {paginatedJobs.length > 0 && (
               <Pagination
                 currentPage={currentPage}
                 totalPages={totalPages}

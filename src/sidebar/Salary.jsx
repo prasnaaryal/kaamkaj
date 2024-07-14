@@ -1,43 +1,28 @@
 import React from "react";
-import Button from "./Button";
-import InputField from "../components/InputField";
+import InputField from "../components/InputFieldFilter";
 
-const Salary = ({ handleChange, handleClick }) => {
+const Salary = ({ selectedFilters, handleChange }) => {
+  const options = [
+    { value: "", title: "All" },
+    { value: "0-30000", title: "<30k" },
+    { value: "30001-50000", title: "30k-50k" },
+    { value: "50001-80000", title: "50k-80k" },
+    { value: "80001-200000", title: "80k+" },
+  ];
+
   return (
     <div>
       <h4 className="text-lg font-medium mb-2">Salary</h4>
-      <div className="mb-4">
-        <Button onClickHandler={handleClick} value="" title="Hourly" />
-        <Button onClickHandler={handleClick} value="Monthly" title="Monthly" />
-        <Button onClickHandler={handleClick} value="Yearly" title="Yearly" />
-      </div>
-
       <div className="flex flex-col gap-2">
-        <InputField
-          handleChange={handleChange}
-          value="All"
-          title="All"
-          name="test2"
-        />
-
-        <InputField
-          handleChange={handleChange}
-          value="30"
-          title="<30k"
-          name="test2"
-        />
-        <InputField
-          handleChange={handleChange}
-          value="50"
-          title="<50k"
-          name="test2"
-        />
-        <InputField
-          handleChange={handleChange}
-          value="80"
-          title="<80k"
-          name="test2"
-        />
+        {options.map((option) => (
+          <InputField
+            key={option.value}
+            handleChange={handleChange}
+            value={option.value}
+            title={option.title}
+            checked={selectedFilters.includes(option.value)}
+          />
+        ))}
       </div>
     </div>
   );

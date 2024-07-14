@@ -1,6 +1,5 @@
 import React from "react";
 import { FiCalendar, FiClock, FiDollarSign, FiMapPin } from "react-icons/fi";
-import { Link } from "react-router-dom";
 
 const Card = ({ data, onClick }) => {
   const {
@@ -47,7 +46,7 @@ const Card = ({ data, onClick }) => {
             </span>
             <span className="flex items-center gap-1">
               <FiCalendar className="text-lg text-blue-500" />
-              {postingDate}
+              {new Date(postingDate).toLocaleDateString()}
             </span>
           </div>
 
