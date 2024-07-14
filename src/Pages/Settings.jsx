@@ -1,24 +1,73 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "../components/CustomToast";
 import Modal from "../components/Modal";
 import { GoAlertFill } from "react-icons/go";
+import axiosInstance from "../config/axiosConfig";
 
 const Settings = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [userEmail, setUserEmail] = useState("");
+  const [oldPassword, setOldPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmNewPassword, setConfirmNewPassword] = useState("");
+  const [passwordMismatch, setPasswordMismatch] = useState(false);
   const navigate = useNavigate();
   const { addToast } = useToast();
+
+  useEffect(() => {
+    const fetchUserEmail = async () => {
+      const token = localStorage.getItem("accessToken");
+      if (token) {
+        try {
+          const response = await axiosInstance.get("/user/load-user", {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          setUserEmail(response.data.user.email);
+        } catch (error) {
+          console.error("Error fetching user data:", error);
+        }
+      }
+    };
+
+    fetchUserEmail();
+  }, []);
+
+  const handlePasswordChange = async () => {
+    if (newPassword !== confirmNewPassword) {
+      setPasswordMismatch(true);
+      return;
+    }
+
+    setPasswordMismatch(false);
+
+    try {
+      const response = await axiosInstance.post("/auth/change-password", {
+        email: userEmail,
+        oldPassword: oldPassword,
+        newPassword: newPassword,
+        confirmPassword: confirmNewPassword,
+      });
+
+      if (response.status === 200) {
+        addToast("Password changed successfully", "success");
+        setOldPassword("");
+        setNewPassword("");
+        setConfirmNewPassword("");
+      }
+    } catch (error) {
+      console.error("Error changing password:", error);
+      addToast("Error changing password", "error");
+    }
+  };
 
   const handleDeactivateClick = () => {
     setIsModalOpen(true);
   };
 
   const handleConfirmDeactivation = () => {
-    // Logic to deactivate account
-    // This could be an API call to deactivate the account
-    // After deactivation, log out the user and show a toast message
-
-    // For demonstration purposes, we'll just clear localStorage and navigate to login
     localStorage.clear();
     addToast("Account deactivated", "success");
     navigate("/");
@@ -42,6 +91,8 @@ const Settings = () => {
                 id="oldPassword"
                 type="password"
                 placeholder="*****"
+                value={oldPassword}
+                onChange={(e) => setOldPassword(e.target.value)}
               />
             </div>
             <div className="flex gap-6">
@@ -57,6 +108,8 @@ const Settings = () => {
                   id="newPassword"
                   type="password"
                   placeholder="New Password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
                 />
               </div>
               <div className="flex flex-col">
@@ -71,12 +124,22 @@ const Settings = () => {
                   id="confirmNewPassword"
                   type="password"
                   placeholder="Confirm New Password"
+                  value={confirmNewPassword}
+                  onChange={(e) => setConfirmNewPassword(e.target.value)}
                 />
+                {passwordMismatch && (
+                  <span className="text-xs text-red-500">
+                    Password mismatch
+                  </span>
+                )}
               </div>
             </div>
           </form>
           <div className="flex mt-8">
-            <button className="bg-[#0A65CC] text-white font-semibold px-8 py-2 rounded-lg mb-4">
+            <button
+              className="bg-[#0A65CC] text-white font-semibold px-8 py-2 rounded-lg mb-4"
+              onClick={handlePasswordChange}
+            >
               Save Changes
             </button>
           </div>
