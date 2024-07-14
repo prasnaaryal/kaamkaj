@@ -127,197 +127,215 @@ const EditProfile = () => {
   };
 
   return (
-    <div className="grid grid-cols-8 gap-4 px-6 py-8">
+    <div>
       {role === "company" ? (
-        <>
-          <div className="col-span-2 flex justify-center">
-            <UploadFile
-              onFileSelected={handleImageSelected}
-              initialFile={
-                userData.image
-                  ? { url: userData.image, name: "Company Image" }
-                  : null
-              }
-            />
-          </div>
-          <div className="col-span-6">
-            <form className="space-y-6">
-              <div className="flex flex-col">
-                <label
-                  htmlFor="fullName"
-                  className="mb-2 text-sm font-medium text-gray-700"
-                >
-                  Company Name
-                </label>
-                <input
-                  className="border rounded py-2 px-3 font-normal h-10 w-full placeholder-[#9199A3]"
-                  id="fullName"
-                  name="fullName"
-                  type="text"
-                  value={userData.fullName}
-                  disabled
-                />
-                <p className="text-xs text-red-500">Names cannot be edited*</p>
-              </div>
-              <div className="flex flex-col">
-                <label
-                  htmlFor="companyAddress"
-                  className="mb-2 text-sm font-medium text-gray-700"
-                >
-                  Company Address
-                </label>
-                <input
-                  className="border rounded py-2 px-3 h-10 w-full placeholder-[#9199A3]"
-                  id="companyAddress"
-                  name="companyAddress"
-                  type="text"
-                  value={userData.companyAddress}
-                  onChange={handleInputChange}
-                />
-              </div>
-              <div className="flex flex-col">
-                <label
-                  htmlFor="companyWebsite"
-                  className="mb-2 text-sm font-medium text-gray-700"
-                >
-                  Company Website
-                </label>
-                <div className="relative w-full">
-                  <span className="absolute left-3 top-2.5 text-gray-500">
-                    <PiLinkSimpleLight className="text-blue-600" />
-                  </span>
+        <div className="space-y-12 mt-10">
+          <h1 className="font-semibold text-2xl">Edit Profile</h1>
+          <div className="border-[1px] border-blue-500"></div>
+        </div>
+      ) : (
+        <div className="space-y-12 mt-6">
+          <h1 className="font-semibold text-2xl">Edit Profile</h1>
+          <div className="border-[1px] border-blue-500"></div>
+        </div>
+      )}
+
+      <div className="grid grid-cols-8 gap-4 px-6 py-8">
+        {role === "company" ? (
+          <>
+            <div className="col-span-2 flex justify-center">
+              <UploadFile
+                onFileSelected={handleImageSelected}
+                initialFile={
+                  userData.image
+                    ? { url: userData.image, name: "Company Image" }
+                    : null
+                }
+              />
+            </div>
+            <div className="col-span-6">
+              <form className="space-y-6">
+                <div className="flex flex-col">
+                  <label
+                    htmlFor="fullName"
+                    className="mb-2 text-sm font-medium text-gray-700"
+                  >
+                    Company Name
+                  </label>
                   <input
-                    className="border rounded py-2 pl-10 pr-3 h-10 w-full placeholder-[#9199A3]"
-                    id="companyWebsite"
-                    name="companyWebsite"
-                    type="url"
-                    value={userData.companyWebsite}
+                    className="border rounded py-2 px-3 font-normal h-10 w-full placeholder-[#9199A3]"
+                    id="fullName"
+                    name="fullName"
+                    type="text"
+                    value={userData.fullName}
+                    disabled
+                  />
+                  <p className="text-xs text-red-500">
+                    Names cannot be edited*
+                  </p>
+                </div>
+                <div className="flex flex-col">
+                  <label
+                    htmlFor="companyAddress"
+                    className="mb-2 text-sm font-medium text-gray-700"
+                  >
+                    Company Address
+                  </label>
+                  <input
+                    className="border rounded py-2 px-3 h-10 w-full placeholder-[#9199A3]"
+                    id="companyAddress"
+                    name="companyAddress"
+                    type="text"
+                    value={userData.companyAddress}
                     onChange={handleInputChange}
                   />
                 </div>
-              </div>
-            </form>
-          </div>
-
-          <div className="col-span-8">
-            <hr className="border-gray-300" />
-          </div>
-
-          <div className="col-span-8 flex flex-col">
-            <h1 className="text-lg font-semibold text-gray-700">About us</h1>
-            <textarea
-              className="border rounded py-2 px-3 h-24 w-full placeholder-[#9199A3] hover:border-bg-blue-100"
-              name="aboutUs"
-              value={userData.aboutUs}
-              onChange={handleInputChange}
-              placeholder="Write down about your company here. Let the candidate know who we are..."
-            />
-            <button
-              className="bg-blue-500 text-white font-bold py-2 px-4 mt-8 rounded h-10 w-52"
-              onClick={handleSaveChanges}
-            >
-              Save Changes
-            </button>
-          </div>
-        </>
-      ) : role === "applicant" ? (
-        <>
-          <div className="col-span-2 flex justify-center">
-            <UploadFile
-              onFileSelected={handleImageSelected}
-              initialFile={
-                userData.image
-                  ? { url: userData.image, name: "Profile Image" }
-                  : null
-              }
-            />
-          </div>
-          <div className="col-span-6">
-            <form className="space-y-6">
-              <div className="flex flex-col">
-                <label
-                  htmlFor="fullName"
-                  className="mb-2 text-sm font-medium text-gray-700"
-                >
-                  Full Name
-                </label>
-                <input
-                  className="border rounded py-2 px-3 font-normal h-10 w-full placeholder-[#9199A3]"
-                  id="fullName"
-                  name="fullName"
-                  type="text"
-                  value={userData.fullName}
-                  disabled
-                />
-                <p className="text-xs text-red-500">Names cannot be edited*</p>
-              </div>
-              <div className="flex flex-col">
-                <label
-                  htmlFor="title"
-                  className="mb-2 text-sm font-medium text-gray-700"
-                >
-                  Title
-                </label>
-                <input
-                  className="border rounded py-2 px-3 h-10 w-full placeholder-[#9199A3]"
-                  id="title"
-                  name="title"
-                  type="text"
-                  value={userData.title}
-                  onChange={handleInputChange}
-                  placeholder="Ex: Junior Developer"
-                />
-              </div>
-              <div className="flex flex-col">
-                <label
-                  htmlFor="personalWebsite"
-                  className="mb-2 text-sm font-medium text-gray-700"
-                >
-                  Personal Website
-                </label>
-                <div className="relative w-full">
-                  <span className="absolute left-3 top-2.5 text-gray-500">
-                    <PiLinkSimpleLight className="text-blue-600" />
-                  </span>
-                  <input
-                    className="border rounded py-2 pl-10 pr-3 h-10 w-full placeholder-[#9199A3]"
-                    id="personalWebsite"
-                    name="personalWebsite"
-                    type="url"
-                    value={userData.personalWebsite}
-                    onChange={handleInputChange}
-                    placeholder="Website URL"
-                  />
+                <div className="flex flex-col">
+                  <label
+                    htmlFor="companyWebsite"
+                    className="mb-2 text-sm font-medium text-gray-700"
+                  >
+                    Company Website
+                  </label>
+                  <div className="relative w-full">
+                    <span className="absolute left-3 top-2.5 text-gray-500">
+                      <PiLinkSimpleLight className="text-blue-600" />
+                    </span>
+                    <input
+                      className="border rounded py-2 pl-10 pr-3 h-10 w-full placeholder-[#9199A3]"
+                      id="companyWebsite"
+                      name="companyWebsite"
+                      type="url"
+                      value={userData.companyWebsite}
+                      onChange={handleInputChange}
+                    />
+                  </div>
                 </div>
-              </div>
-            </form>
-          </div>
+              </form>
+            </div>
 
-          <div className="px-32 col-span-8 flex flex-col">
-            <h1 className="text-lg font-semibold text-gray-700 mb-10">
-              Your CV/Resume
-            </h1>
-            <UploadPDF
-              onFileSelected={handleFileSelected}
-              initialFile={null}
-              cv={userData.cv}
-            />
+            <div className="col-span-8">
+              <hr className="border-gray-300" />
+            </div>
 
-            <div className="flex justify-end">
+            <div className="col-span-8 flex flex-col">
+              <h1 className="text-lg font-semibold text-gray-700">About us</h1>
+              <textarea
+                className="border rounded py-2 px-3 h-24 w-full placeholder-[#9199A3] hover:border-bg-blue-100"
+                name="aboutUs"
+                value={userData.aboutUs}
+                onChange={handleInputChange}
+                placeholder="Write down about your company here. Let the candidate know who we are..."
+              />
               <button
-                className="bg-blue-600 text-white font-bold py-2 px-4 mt-8 rounded-lg h-14 w-52"
+                className="bg-blue-500 text-white font-bold py-2 px-4 mt-8 rounded h-10 w-52"
                 onClick={handleSaveChanges}
               >
                 Save Changes
               </button>
             </div>
+          </>
+        ) : role === "applicant" ? (
+          <>
+            <div className="col-span-2 flex justify-center">
+              <UploadFile
+                onFileSelected={handleImageSelected}
+                initialFile={
+                  userData.image
+                    ? { url: userData.image, name: "Profile Image" }
+                    : null
+                }
+              />
+            </div>
+            <div className="col-span-6">
+              <form className="space-y-6">
+                <div className="flex flex-col">
+                  <label
+                    htmlFor="fullName"
+                    className="mb-2 text-sm font-medium text-gray-700"
+                  >
+                    Full Name
+                  </label>
+                  <input
+                    className="border rounded py-2 px-3 font-normal h-10 w-full placeholder-[#9199A3]"
+                    id="fullName"
+                    name="fullName"
+                    type="text"
+                    value={userData.fullName}
+                    disabled
+                  />
+                  <p className="text-xs text-red-500">
+                    Names cannot be edited*
+                  </p>
+                </div>
+                <div className="flex flex-col">
+                  <label
+                    htmlFor="title"
+                    className="mb-2 text-sm font-medium text-gray-700"
+                  >
+                    Title
+                  </label>
+                  <input
+                    className="border rounded py-2 px-3 h-10 w-full placeholder-[#9199A3]"
+                    id="title"
+                    name="title"
+                    type="text"
+                    value={userData.title}
+                    onChange={handleInputChange}
+                    placeholder="Ex: Junior Developer"
+                  />
+                </div>
+                <div className="flex flex-col">
+                  <label
+                    htmlFor="personalWebsite"
+                    className="mb-2 text-sm font-medium text-gray-700"
+                  >
+                    Personal Website
+                  </label>
+                  <div className="relative w-full">
+                    <span className="absolute left-3 top-2.5 text-gray-500">
+                      <PiLinkSimpleLight className="text-blue-600" />
+                    </span>
+                    <input
+                      className="border rounded py-2 pl-10 pr-3 h-10 w-full placeholder-[#9199A3]"
+                      id="personalWebsite"
+                      name="personalWebsite"
+                      type="url"
+                      value={userData.personalWebsite}
+                      onChange={handleInputChange}
+                      placeholder="Website URL"
+                    />
+                  </div>
+                </div>
+              </form>
+            </div>
+
+            <div className="px-32 col-span-8 flex flex-col">
+              <h1 className="text-lg font-semibold text-gray-700 mb-10">
+                Your CV/Resume
+              </h1>
+              <UploadPDF
+                onFileSelected={handleFileSelected}
+                initialFile={null}
+                cv={userData.cv}
+              />
+
+              <div className="flex justify-end">
+                <button
+                  className="bg-blue-600 text-white font-bold py-2 px-4 mt-8 rounded-lg h-14 w-52"
+                  onClick={handleSaveChanges}
+                >
+                  Save Changes
+                </button>
+              </div>
+            </div>
+          </>
+        ) : (
+          <div className="col-span-8 text-center">
+            <p className="text-gray-500">Loading...</p>
           </div>
-        </>
-      ) : (
-        <div className="col-span-8 text-center">
-          <p className="text-gray-500">Loading...</p>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };
