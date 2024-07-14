@@ -139,6 +139,22 @@ const Navbar = () => {
     }
   };
 
+  const handleForgotPasswordSubmit = async (e) => {
+    e.preventDefault();
+    const email = e.target.email.value;
+
+    if (!email) {
+      addToast("Please enter your email address", "error");
+      return;
+    }
+
+    // Simulate a delay for formality
+    setTimeout(() => {
+      addToast("Reset link has been sent to your email", "success");
+      closeforgetPasswordModal();
+    }, 500);
+  };
+
   const handleLogout = () => {
     localStorage.removeItem("accessToken");
     localStorage.removeItem("fullName");
@@ -563,28 +579,32 @@ const Navbar = () => {
         isOpen={forgetPasswordModal}
         onClose={closeforgetPasswordModal}
         title="Forgot Password?"
+        className="w-full max-w-md"
       >
         <div className="flex flex-col items-center">
           <h1 className="font-bold text-xl">Forgot Password?</h1>
-          <p className="text-base text-[#545454]">
+          <p className="text-base text-[#545454] text-center">
             Please enter your email address and we will send you an email to
             update your password.
           </p>
         </div>
-        <form>
+        <form onSubmit={handleForgotPasswordSubmit}>
           <div className="px-4 mt-10">
             <input
               className="border rounded-lg py-2 px-3 font-normal h-10 w-full placeholder-gray-600"
               id="email"
               type="email"
+              name="email"
               placeholder="Email"
             />
           </div>
+          <div className="mt-6 px-4">
+            <button className="bg-blue-500 text-white font-bold py-2 px-4 rounded h-10 w-full">
+              Submit
+            </button>
+          </div>
         </form>
         <div className="mt-6 px-4">
-          <button className="bg-blue-500 text-white font-bold py-2 px-4 rounded h-10 w-full">
-            Submit
-          </button>
           <div className="flex justify-between mt-4">
             <div>
               <a
