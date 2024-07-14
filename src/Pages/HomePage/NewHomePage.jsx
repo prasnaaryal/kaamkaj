@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import Search from "./components/Search";
 import Info from "./components/Info";
@@ -13,6 +13,8 @@ import axiosInstance from "../../config/axiosConfig";
 
 const NewHomePage = () => {
   const navigate = useNavigate();
+  const jobsSectionRef = useRef(null);
+  const searchSectionRef = useRef(null);
 
   const [selectedFilters, setSelectedFilters] = useState({
     category: [],
@@ -25,6 +27,7 @@ const NewHomePage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [jobs, setJobs] = useState([]);
+  const [filteredJobs, setFilteredJobs] = useState([]);
   const itemsPerPage = 6;
 
   useEffect(() => {
@@ -33,6 +36,7 @@ const NewHomePage = () => {
       .get("/job/getalljobs")
       .then((res) => {
         setJobs(res.data);
+        setFilteredJobs(res.data);
         setIsLoading(false);
       })
       .catch((error) => {
@@ -42,8 +46,32 @@ const NewHomePage = () => {
   }, []);
 
   const [query, setQuery] = useState("");
+  const [location, setLocation] = useState("");
+
   const handleInputChange = (event) => {
     setQuery(event.target.value);
+  };
+
+  const handleLocationChange = (event) => {
+    setLocation(event.target.value);
+  };
+
+  const handleSearch = (searchQuery, searchLocation) => {
+    setQuery(searchQuery);
+    setLocation(searchLocation);
+
+    const filtered = jobs.filter(
+      (job) =>
+        job.jobTitle.toLowerCase().includes(searchQuery.toLowerCase()) &&
+        (searchLocation === "" ||
+          job.jobLocation.toLowerCase().includes(searchLocation.toLowerCase()))
+    );
+
+    setFilteredJobs(filtered);
+    setCurrentPage(1); // Reset to the first page after search
+
+    // Smooth scroll to jobs section
+    jobsSectionRef.current.scrollIntoView({ behavior: "smooth" });
   };
 
   const handleFilterChange = (category, value) => {
@@ -91,8 +119,7 @@ const NewHomePage = () => {
     return parseInt(job.maxSalary) >= min && parseInt(job.maxSalary) <= max;
   };
 
-  const filteredJobs = jobs.filter((job) => {
-    const queryMatch = job.jobTitle.toLowerCase().includes(query.toLowerCase());
+  const filteredJobsByFilters = filteredJobs.filter((job) => {
     const categoryMatch = selectedFilters.category.length
       ? selectedFilters.category.includes(job.category)
       : true;
@@ -120,7 +147,6 @@ const NewHomePage = () => {
       : true;
 
     return (
-      queryMatch &&
       categoryMatch &&
       salaryMatch &&
       dateMatch &&
@@ -131,12 +157,15 @@ const NewHomePage = () => {
 
   const calculatePageRange = () => {
     const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = Math.min(startIndex + itemsPerPage, filteredJobs.length);
+    const endIndex = Math.min(
+      startIndex + itemsPerPage,
+      filteredJobsByFilters.length
+    );
     return { startIndex, endIndex };
   };
 
   const nextPage = () => {
-    if (currentPage < Math.ceil(filteredJobs.length / itemsPerPage)) {
+    if (currentPage < Math.ceil(filteredJobsByFilters.length / itemsPerPage)) {
       setCurrentPage(currentPage + 1);
     }
   };
@@ -156,12 +185,24 @@ const NewHomePage = () => {
   };
 
   const { startIndex, endIndex } = calculatePageRange();
-  const paginatedJobs = filteredJobs.slice(startIndex, endIndex);
-  const totalPages = Math.ceil(filteredJobs.length / itemsPerPage);
+  const paginatedJobs = filteredJobsByFilters.slice(startIndex, endIndex);
+  const totalPages = Math.ceil(filteredJobsByFilters.length / itemsPerPage);
+
+  const handleLastBannerSearchClick = () => {
+    searchSectionRef.current.scrollIntoView({ behavior: "smooth" });
+  };
 
   return (
     <div>
-      <Search query={query} handleInputChange={handleInputChange} />
+      <div ref={searchSectionRef}>
+        <Search
+          query={query}
+          location={location}
+          handleInputChange={handleInputChange}
+          handleLocationChange={handleLocationChange}
+          handleSearch={handleSearch}
+        />
+      </div>
       <Info />
       <FeaturedJobs />
       <div className="mt-10">
@@ -179,7 +220,10 @@ const NewHomePage = () => {
               handleExperienceLevelChange={handleExperienceLevelChange}
             />
           </div>
-          <div className="col-span-2 bg-white p-4 rounded-sm">
+          <div
+            className="col-span-2 bg-white p-4 rounded-sm"
+            ref={jobsSectionRef}
+          >
             {isLoading ? (
               <p className="font-medium">Loading....</p>
             ) : paginatedJobs.length > 0 ? (
@@ -204,7 +248,7 @@ const NewHomePage = () => {
         </div>
       </div>
       <Clients />
-      <LastBanner />
+      <LastBanner onSearchClick={handleLastBannerSearchClick} />
     </div>
   );
 };
