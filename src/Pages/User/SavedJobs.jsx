@@ -4,8 +4,11 @@ import { CiCalendar } from "react-icons/ci";
 import { RxBookmarkFilled } from "react-icons/rx";
 import axiosInstance from "../../config/axiosConfig";
 import { BsWallet } from "react-icons/bs";
+import { useToast } from "../../components/CustomToast";
 
 const SavedJobs = () => {
+  const { addToast } = useToast();
+
   const [jobs, setJobs] = useState([]);
   const [filteredJobs, setFilteredJobs] = useState([]);
   const [searchText, setSearchText] = useState("");
@@ -35,9 +38,32 @@ const SavedJobs = () => {
     fetchJobs();
   }, []);
 
+  const unsaveJob = async (jobId) => {
+    try {
+      const token = localStorage.getItem("accessToken");
+      await axiosInstance.post(
+        "/job/favorite/unsave",
+        { jobId },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      addToast("Job unsaved successfully", "success");
+      // Remove the job from the state
+      setJobs((prevJobs) => prevJobs.filter((job) => job._id !== jobId));
+      setFilteredJobs((prevFilteredJobs) =>
+        prevFilteredJobs.filter((job) => job._id !== jobId)
+      );
+    } catch (error) {
+      addToast("Error unsaving job:", "error");
+    }
+  };
+
   const indexOfLastItem = currentPage * itemsPerPage;
-  const itemsOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentJobs = filteredJobs.slice(itemsOfFirstItem, indexOfLastItem);
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentJobs = filteredJobs.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(filteredJobs.length / itemsPerPage);
 
   const handleSearch = (e) => {
@@ -101,7 +127,7 @@ const SavedJobs = () => {
         <div className="border-[1px] border-blue-500"></div>
       </div>
       <section className="py-1 bg-blueGray-50">
-        <div className="w-full mb-12 xl:mb-0 px-4  mt-16">
+        <div className="w-full mb-12 xl:mb-0 px-4 mt-16">
           <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-6 shadow-lg rounded">
             <div className="block w-full overflow-x-auto">
               {isLoading ? (
@@ -145,7 +171,10 @@ const SavedJobs = () => {
                             </div>
                           </div>
                         </div>
-                        <RxBookmarkFilled className="text-gray-500" />
+                        <RxBookmarkFilled
+                          className="text-gray-500 cursor-pointer"
+                          onClick={() => unsaveJob(job._id)}
+                        />
                       </div>
                     ))
                   )}
