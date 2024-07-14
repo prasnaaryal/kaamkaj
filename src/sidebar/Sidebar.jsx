@@ -3,6 +3,7 @@ import Salary from "./Salary";
 import JobPostingData from "./JobPostingData";
 import EmploymentType from "./EmploymentType";
 import ExperienceLevel from "./ExperienceLevel";
+import Categories from "./Categories";
 
 const Sidebar = ({
   selectedFilters,
@@ -15,6 +16,10 @@ const Sidebar = ({
   return (
     <div className="space-y-5">
       <h3 className="text-lg font-bold mb-2">Filters</h3>
+      <Categories
+        selectedFilters={selectedFilters.category}
+        handleChange={handleCategoryChange}
+      />
       <Salary
         selectedFilters={selectedFilters.salary}
         handleChange={handleSalaryChange}

@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import Search from "./components/Search";
 import Info from "./components/Info";
 import Jobs from "../Jobs";
@@ -13,6 +13,7 @@ import axiosInstance from "../../config/axiosConfig";
 
 const NewHomePage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const jobsSectionRef = useRef(null);
   const searchSectionRef = useRef(null);
 
@@ -45,26 +46,48 @@ const NewHomePage = () => {
       });
   }, []);
 
+  useEffect(() => {
+    if (location.state && location.state.category) {
+      setSelectedFilters((prevFilters) => ({
+        ...prevFilters,
+        category: [location.state.category.toLowerCase()],
+      }));
+      filterJobsByCategory(location.state.category.toLowerCase());
+      jobsSectionRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [location.state, jobs]);
+
+  const filterJobsByCategory = (category) => {
+    const filtered = jobs.filter(
+      (job) => job.category && job.category.toLowerCase() === category
+    );
+    setFilteredJobs(filtered);
+  };
+
   const [query, setQuery] = useState("");
-  const [location, setLocation] = useState("");
+  const [locationText, setLocationText] = useState("");
 
   const handleInputChange = (event) => {
     setQuery(event.target.value);
   };
 
   const handleLocationChange = (event) => {
-    setLocation(event.target.value);
+    setLocationText(event.target.value);
   };
 
   const handleSearch = (searchQuery, searchLocation) => {
     setQuery(searchQuery);
-    setLocation(searchLocation);
+    setLocationText(searchLocation);
 
     const filtered = jobs.filter(
       (job) =>
+        job.jobTitle &&
         job.jobTitle.toLowerCase().includes(searchQuery.toLowerCase()) &&
         (searchLocation === "" ||
-          job.jobLocation.toLowerCase().includes(searchLocation.toLowerCase()))
+          (job.jobLocation &&
+            job.jobLocation
+              .toLowerCase()
+              .includes(searchLocation.toLowerCase())))
     );
 
     setFilteredJobs(filtered);
@@ -83,12 +106,22 @@ const NewHomePage = () => {
           [category]: isChecked ? [] : [value],
         };
       } else {
-        return {
-          ...prevState,
-          [category]: isChecked
-            ? prevState[category].filter((item) => item !== value)
-            : [...prevState[category], value],
-        };
+        if (value === "all") {
+          return {
+            ...prevState,
+            [category]: isChecked ? [] : [value],
+          };
+        } else {
+          return {
+            ...prevState,
+            [category]: isChecked
+              ? prevState[category].filter((item) => item !== value)
+              : [
+                  ...prevState[category].filter((item) => item !== "all"),
+                  value,
+                ],
+          };
+        }
       }
     });
   };
@@ -121,7 +154,10 @@ const NewHomePage = () => {
 
   const filteredJobsByFilters = filteredJobs.filter((job) => {
     const categoryMatch = selectedFilters.category.length
-      ? selectedFilters.category.includes(job.category)
+      ? selectedFilters.category.includes("all") ||
+        selectedFilters.category.includes(
+          job.category ? job.category.toLowerCase() : ""
+        )
       : true;
     const salaryMatch = selectedFilters.salary.length
       ? selectedFilters.salary.includes("") ||
@@ -136,13 +172,13 @@ const NewHomePage = () => {
     const employmentTypeMatch = selectedFilters.employmentType.length
       ? selectedFilters.employmentType.includes("all") ||
         selectedFilters.employmentType.includes(
-          job.employmentType.toLowerCase()
+          job.employmentType ? job.employmentType.toLowerCase() : ""
         )
       : true;
     const experienceLevelMatch = selectedFilters.experienceLevel.length
       ? selectedFilters.experienceLevel.includes("all") ||
         selectedFilters.experienceLevel.includes(
-          job.experienceLevel.toLowerCase()
+          job.experienceLevel ? job.experienceLevel.toLowerCase() : ""
         )
       : true;
 
@@ -197,7 +233,7 @@ const NewHomePage = () => {
       <div ref={searchSectionRef}>
         <Search
           query={query}
-          location={location}
+          location={locationText}
           handleInputChange={handleInputChange}
           handleLocationChange={handleLocationChange}
           handleSearch={handleSearch}
