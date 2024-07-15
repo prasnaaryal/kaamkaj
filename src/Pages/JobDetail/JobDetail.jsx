@@ -34,7 +34,7 @@ const JobDetail = () => {
   return (
     <div>
       <div className="pl-16 pr-16">
-        <img src="/images/banner4.jpg" className="w-full h-[400px]" alt="" />
+        <img src="/images/image5.png" className="w-full h-[400px]" alt="" />
       </div>
 
       <div className="py-10 pl-16 pr-16 ">

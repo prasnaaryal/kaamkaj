@@ -1,4 +1,8 @@
+import { FaQ } from "react-icons/fa6";
 import MainLayout from "../layouts/MainLayout";
+import About from "../Pages/About";
+import Contact from "../Pages/Contact";
+import FAQ from "../Pages/Faq";
 
 // Pages
 import Home from "../Pages/Home";
@@ -31,7 +35,20 @@ const AuthenticationRoutes = {
       path: "job/:id",
       element: <JobDetail />,
     },
+    {
+      path: "aboutus",
+      element: <About/>,
+    },
+    {
+      path: "contactus",
+      element: <Contact/>,
+    },
+    {
+      path: "faq",
+      element: <FAQ/>,
+    },
   ],
+
 };
 
 export default AuthenticationRoutes;
