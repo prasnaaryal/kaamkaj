@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useToast } from "../components/CustomToast";
 import Modal from "../components/Modal";
 import { GoAlertFill } from "react-icons/go";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 import axiosInstance from "../config/axiosConfig";
 
 const Settings = () => {
@@ -12,6 +13,9 @@ const Settings = () => {
   const [newPassword, setNewPassword] = useState("");
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
   const [passwordMismatch, setPasswordMismatch] = useState(false);
+  const [showOldPassword, setShowOldPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmNewPassword, setShowConfirmNewPassword] = useState(false);
   const navigate = useNavigate();
   const { addToast } = useToast();
 
@@ -86,14 +90,22 @@ const Settings = () => {
               >
                 Old Password{" "}
               </label>
-              <input
-                className="border rounded py-2 px-3 font-normal h-10 w-72 placeholder-[#9199A3]"
-                id="oldPassword"
-                type="password"
-                placeholder="*****"
-                value={oldPassword}
-                onChange={(e) => setOldPassword(e.target.value)}
-              />
+              <div className="relative w-72">
+                <input
+                  className="border rounded py-2 px-3 font-normal h-10 w-full placeholder-[#9199A3]"
+                  id="oldPassword"
+                  type={showOldPassword ? "text" : "password"}
+                  placeholder="*****"
+                  value={oldPassword}
+                  onChange={(e) => setOldPassword(e.target.value)}
+                />
+                <span
+                  className="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer"
+                  onClick={() => setShowOldPassword(!showOldPassword)}
+                >
+                  {showOldPassword ? <FaEyeSlash /> : <FaEye />}
+                </span>
+              </div>
             </div>
             <div className="flex gap-6">
               <div className="flex flex-col">
@@ -103,14 +115,22 @@ const Settings = () => {
                 >
                   New Password
                 </label>
-                <input
-                  className="border rounded py-2 px-3 h-10 w-72 placeholder-[#9199A3]"
-                  id="newPassword"
-                  type="password"
-                  placeholder="New Password"
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                />
+                <div className="relative w-72">
+                  <input
+                    className="border rounded py-2 px-3 h-10 w-full placeholder-[#9199A3]"
+                    id="newPassword"
+                    type={showNewPassword ? "text" : "password"}
+                    placeholder="New Password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                  />
+                  <span
+                    className="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer"
+                    onClick={() => setShowNewPassword(!showNewPassword)}
+                  >
+                    {showNewPassword ? <FaEyeSlash /> : <FaEye />}
+                  </span>
+                </div>
               </div>
               <div className="flex flex-col">
                 <label
@@ -119,14 +139,22 @@ const Settings = () => {
                 >
                   Confirm New Password
                 </label>
-                <input
-                  className="border rounded py-2 px-3 h-10 w-72 placeholder-[#9199A3]"
-                  id="confirmNewPassword"
-                  type="password"
-                  placeholder="Confirm New Password"
-                  value={confirmNewPassword}
-                  onChange={(e) => setConfirmNewPassword(e.target.value)}
-                />
+                <div className="relative w-72">
+                  <input
+                    className="border rounded py-2 px-3 h-10 w-full placeholder-[#9199A3]"
+                    id="confirmNewPassword"
+                    type={showConfirmNewPassword ? "text" : "password"}
+                    placeholder="Confirm New Password"
+                    value={confirmNewPassword}
+                    onChange={(e) => setConfirmNewPassword(e.target.value)}
+                  />
+                  <span
+                    className="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer"
+                    onClick={() => setShowConfirmNewPassword(!showConfirmNewPassword)}
+                  >
+                    {showConfirmNewPassword ? <FaEyeSlash /> : <FaEye />}
+                  </span>
+                </div>
                 {passwordMismatch && (
                   <span className="text-xs text-red-500">
                     Password mismatch

@@ -61,6 +61,9 @@ const Navbar = () => {
     if (!fullName || !email || !password || !confirmPassword) {
       errors.missingFields = "Please enter required fields";
     }
+    if (/\d/.test(fullName)) {
+      errors.fullNameInvalid = "Full name cannot contain numbers";
+    }
     if (password !== confirmPassword) {
       errors.passwordMismatch = "Password and confirm password do not match";
     }
@@ -492,6 +495,11 @@ const Navbar = () => {
                 value={data.fullName}
                 onChange={handleOnChange}
               />
+              {validationErrors.fullNameInvalid && (
+                <p className="text-red-500 text-sm mt-2">
+                  {validationErrors.fullNameInvalid}
+                </p>
+              )}
             </div>
             <div className="mt-6 px-4">
               <input
