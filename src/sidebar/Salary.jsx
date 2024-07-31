@@ -7,7 +7,7 @@ const Salary = ({ selectedFilters, handleChange }) => {
     { value: "0-30000", title: "<30k" },
     { value: "30001-50000", title: "30k-50k" },
     { value: "50001-80000", title: "50k-80k" },
-    { value: "80001-200000", title: "80k+" },
+    { value: "80001-200000000", title: "80k+" },
   ];
 
   return (
